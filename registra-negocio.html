@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Registra tu negocio | YaLoPido</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --urbix-blue: #0b1c2e;
+            --urbix-cyan: #00aeef;
+            --urbix-green: #39b54a;
+            --urbix-yellow: #ffd100;
+            --uber-grey: #f6f6f6;
+            --uber-dark-grey: #545454;
+            --uber-border: #e2e2e2;
+            --uber-success: #39b54a;
+            --uber-error: #e11900;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--uber-white);
+            color: var(--uber-black);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navbar */
+        nav {
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--uber-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: var(--urbix-blue);
+            color: white;
+            z-index: 1000;
+        }
+
+        .logo img {
+            height: 35px;
+            width: auto;
+        }
+
+        /* Hero */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 3rem;
+        }
+
+        @media (min-width: 768px) {
+            .hero {
+                flex-direction: row;
+                align-items: center;
+                padding: 6rem 2rem;
+            }
+        }
+
+        .hero-content {
+            flex: 1;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -1.5px;
+        }
+
+        @media (min-width: 768px) {
+            .hero-title {
+                font-size: 3.5rem;
+            }
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--uber-dark-grey);
+            margin-bottom: 2rem;
+            max-width: 500px;
+        }
+
+        .hero-image {
+            flex: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Stepper Form */
+        .registration-section {
+            background: var(--uber-grey);
+            padding: 5rem 2rem;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .stepper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .stepper::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--uber-border);
+            z-index: 1;
+        }
+
+        .step {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--uber-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            border-color: var(--urbix-cyan);
+            background: var(--urbix-cyan);
+            color: white;
+        }
+
+        .step.completed {
+            border-color: var(--urbix-green);
+            background: var(--urbix-green);
+            color: white;
+        }
+
+        .step-label {
+            position: absolute;
+            top: 40px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            color: var(--uber-dark-grey);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Form Steps */
+        .form-step {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2.step-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        p.step-desc {
+            font-size: 0.9rem;
+            color: var(--uber-dark-grey);
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--uber-black);
+        }
+
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--uber-border);
+            background: #fcfcfc;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+            border-radius: 2px;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            border-color: var(--urbix-cyan);
+            border-width: 2px;
+            padding: 11px 15px;
+            /* Compensa el ancho del borde */
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .uber-btn {
+            padding: 1rem 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            border: none;
+            flex: 1;
+        }
+
+        .btn-black {
+            background: var(--urbix-blue);
+            color: white;
+        }
+
+        .btn-black:hover {
+            background: var(--urbix-cyan);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--uber-border);
+            color: var(--uber-black);
+        }
+
+        .btn-outline:hover {
+            background: var(--uber-grey);
+        }
+
+        .error-msg {
+            color: var(--uber-error);
+            font-size: 0.75rem;
+            margin-top: 4px;
+            display: none;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 2rem;
+            background: var(--uber-black);
+            color: white;
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .copyright {
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="logo">YaLoPido</div>
+        <div style="font-size: 0.9rem; font-weight: 600;">Pánuco, Ver. <span
+                style="opacity:0.5; font-weight:400;">v4.0</span></div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Lleva tu negocio al siguiente nivel con Urbix</h1>
+                <p class="hero-subtitle">Únete a la plataforma de entrega líder en la región y llega a miles de clientes
+                    nuevos todos los días. Nuestro lema: Pedir Fácil • Vender Fácil.</p>
+                <button class="uber-btn btn-black"
+                    onclick="document.getElementById('registro').scrollIntoView({behavior:'smooth'})"
+                    style="max-width: 250px;">Comenzar ahora</button>
+            </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&q=80"
+                    alt="Restaurante Profesional">
+            </div>
+        </section>
+
+        <section class="registration-section" id="registro">
+            <div class="form-container">
+                <div class="stepper">
+                    <div class="step active" id="step-1-dot">1 <span class="step-label">Dueño</span></div>
+                    <div class="step" id="step-2-dot">2 <span class="step-label">Negocio</span></div>
+                    <div class="step" id="step-3-dot">3 <span class="step-label">Logística</span></div>
+                </div>
+
+                <form id="registration-form">
+                    <!-- Step 1: Owner Data -->
+                    <div class="form-step active" id="step-1">
+                        <h2 class="step-title">Datos del Dueño</h2>
+                        <p class="step-desc">Queremos saber quién está detrás de este gran proyecto.</p>
+
+                        <div class="input-group">
+                            <label for="owner_name">Nombre completo</label>
+                            <input type="text" id="owner_name" name="owner_name" placeholder="Ej. Juan Pérez" required>
+                            <span class="error-msg">Este campo es obligatorio</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="owner_phone">Teléfono de contacto</label>
+                            <input type="tel" id="owner_phone" name="owner_phone" placeholder="846 123 4567" required>
+                            <span class="error-msg">Ingresa un teléfono válido</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="owner_email">Correo electrónico (Será tu usuario)</label>
+                            <input type="email" id="owner_email" name="owner_email" placeholder="juan@ejemplo.com"
+                                required>
+                            <span class="error-msg">Ingresa un correo válido</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="password">Contraseña para tu panel</label>
+                            <input type="password" id="password" name="password" placeholder="••••••••" required>
+                            <span class="error-msg">Crea una contraseña segura</span>
+                        </div>
+
+                        <div class="button-group">
+                            <button type="button" class="uber-btn btn-black" onclick="nextStep(2)">Siguiente</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Business Data -->
+                    <div class="form-step" id="step-2">
+                        <h2 class="step-title">Datos del Negocio</h2>
+                        <p class="step-desc">Cuéntanos sobre tu establecimiento.</p>
+
+                        <div class="input-group">
+                            <label for="biz_name">Nombre comercial</label>
+                            <input type="text" id="biz_name" name="biz_name" placeholder="Ej. Tacos El Rey" required>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="biz_category">Tipo de comida</label>
+                            <select id="biz_category" name="biz_category" required>
+                                <option value="">Selecciona una opción</option>
+                                <option value="Mexicana">Mexicana / Antojitos</option>
+                                <option value="Hamburguesas">Hamburguesas / Snacks</option>
+                                <option value="Pizza">Pizza</option>
+                                <option value="Sushi">Sushi / Japonesa</option>
+                                <option value="Postres">Postres / Pastelería</option>
+                                <option value="Bebidas">Bebidas / Cafetería</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="biz_address">Dirección exacta en Pánuco</label>
+                            <textarea id="biz_address" name="biz_address"
+                                placeholder="Calle, número, colonia y referencias" rows="3" required></textarea>
+                        </div>
+
+                        <div class="button-group">
+                            <button type="button" class="uber-btn btn-outline" onclick="nextStep(1)">Atrás</button>
+                            <button type="button" class="uber-btn btn-black" onclick="nextStep(3)">Siguiente</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Logistics -->
+                    <div class="form-step" id="step-3">
+                        <h2 class="step-title">Logística y Pedidos</h2>
+                        <p class="step-desc">¿Cómo recibiremos tus deliciosos pedidos?</p>
+
+                        <div class="input-group">
+                            <label for="whatsapp_orders">WhatsApp para pedidos</label>
+                            <input type="tel" id="whatsapp_orders" name="whatsapp_orders" placeholder="52 846 123 4567"
+                                required>
+                            <small style="color: grey; font-size: 0.7rem;">Este número recibirá las notificaciones de
+                                nuevos pedidos.</small>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="base_zone">Selecciona tu zona base</label>
+                            <select id="base_zone" name="base_zone" required>
+                                <option value="">Cargando zonas...</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label style="margin-bottom: 15px; display: block;">Servicios que ofrecerás:</label>
+
+                            <div
+                                style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 10px; background: #fff; border-radius: 8px; border: 1px solid #eee;">
+                                <input type="checkbox" id="entrega" name="entrega" value="1" checked
+                                    style="width: auto;">
+                                <label for="entrega" style="margin: 0; font-weight: 500;">Servicio a Domicilio</label>
+                            </div>
+
+                            <div
+                                style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 10px; background: #fff; border-radius: 8px; border: 1px solid #eee;">
+                                <input type="checkbox" id="recolecta" name="recolecta" value="1" checked
+                                    style="width: auto;">
+                                <label for="recolecta" style="margin: 0; font-weight: 500;">Para llevar (Cliente
+                                    pasa)</label>
+                            </div>
+
+                            <div
+                                style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 10px; background: #fff; border-radius: 8px; border: 1px solid #eee;">
+                                <input type="checkbox" id="sucursal" name="sucursal" value="1" style="width: auto;">
+                                <label for="sucursal" style="margin: 0; font-weight: 500;">Consumo en el Local</label>
+                            </div>
+                        </div>
+
+                        <div class="button-group">
+                            <button type="button" class="uber-btn btn-outline" onclick="nextStep(2)">Atrás</button>
+                            <button type="submit" class="uber-btn btn-black" id="submit-btn">Enviar solicitud de
+                                socio</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-logo"><img src="logo.png" alt="Urbix" style="height: 30px; filter: brightness(0) invert(1);">
+        </div>
+        <div class="copyright">&copy; 2026 Urbix. Todos los derechos reservados.</div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        let currentStep = 1;
+
+        // Fetch zones for Step 3
+        async function loadZones() {
+            const select = document.getElementById('base_zone');
+            try {
+                const res = await fetch('get_zonas_nm.php');
+                const json = await res.json();
+                if (json.status === 'success') {
+                    select.innerHTML = '<option value="">Selecciona una colonia</option>';
+                    json.data.forEach(z => {
+                        const opt = document.createElement('option');
+                        opt.value = z.id;
+                        opt.textContent = z.nombre_colonia;
+                        select.appendChild(opt);
+                    });
+                }
+            } catch (e) {
+                console.error("Error loading zones", e);
+                select.innerHTML = '<option value="">Error al cargar zonas</option>';
+            }
+        }
+
+        loadZones();
+
+        function nextStep(step) {
+            // Validation for current step
+            if (step > currentStep) {
+                const currentContainer = document.getElementById(`step-${currentStep}`);
+                const inputs = currentContainer.querySelectorAll('input, select, textarea');
+                let valid = true;
+
+                inputs.forEach(input => {
+                    if (input.required && !input.value) {
+                        valid = false;
+                        input.style.borderColor = 'var(--uber-error)';
+                    } else {
+                        input.style.borderColor = 'var(--uber-border)';
+                    }
+                });
+
+                if (!valid) return;
+            }
+
+            // Update UI
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            document.getElementById(`step-${step}`).classList.add('active');
+
+            document.getElementById(`step-${currentStep}-dot`).classList.remove('active');
+            if (step > currentStep) document.getElementById(`step-${currentStep}-dot`).classList.add('completed');
+            document.getElementById(`step-${step}-dot`).classList.add('active');
+
+            currentStep = step;
+            window.scrollTo({ top: document.getElementById('registro').offsetTop - 100, behavior: 'smooth' });
+        }
+
+        document.getElementById('registration-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = 'Enviando...';
+            btn.disabled = true;
+
+            const formData = new FormData(e.target);
+
+            try {
+                // Added ?v=timestamp to force a clean request and skip cache
+                const res = await fetch(`save_final.php?v=${Date.now()}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const json = await res.json();
+
+                if (json.status === 'success') {
+                    window.location.href = `gracias.html?negocio=${encodeURIComponent(formData.get('biz_name'))}`;
+                } else {
+                    alert('Error: ' + json.message);
+                    btn.innerText = 'Enviar solicitud de socio';
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Ocurrió un error al enviar la solicitud.');
+                btn.innerText = 'Enviar solicitud de socio';
+                btn.disabled = false;
+            }
+        };
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Gracias por registrarte! | YaLoPido</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --urbix-blue: #0b1c2e;
+            --urbix-cyan: #00aeef;
+            --urbix-green: #39b54a;
+            --urbix-yellow: #ffd100;
+            --uber-grey: #f6f6f6;
+            --uber-dark-grey: #545454;
+            --uber-success: #39b54a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--uber-white);
+            color: var(--uber-black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 500px;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--urbix-green);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            animation: scaleIn 0.5s ease;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+
+            to {
+                transform: scale(1);
+            }
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: var(--uber-dark-grey);
+            margin-bottom: 2.5rem;
+            line-height: 1.5;
+        }
+
+        .whatsapp-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            background: var(--urbix-blue);
+            color: white;
+            text-decoration: none;
+            padding: 1.2rem 2rem;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: background 0.2s ease;
+        }
+
+        .whatsapp-btn:hover {
+            background: var(--urbix-cyan);
+        }
+
+        .notice {
+            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: var(--uber-dark-grey);
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="success-icon">
+            <i data-lucide="check" style="width: 40px; height: 40px;"></i>
+        </div>
+        <h1>¡Solicitud recibida!</h1>
+        <p>Hemos registrado los datos de <strong id="nombre-negocio">tu negocio</strong>. Estamos listos para ayudarte a
+            crecer con YaLoPido.</p>
+
+        <a href="index.html" class="whatsapp-btn">
+            <i data-lucide="home"></i>
+            Volver al inicio
+        </a>
+
+        <div class="notice">
+            Un asesor de YaLoPido revisará tu información en las próximas 24 horas.
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Get business name from URL
+        const params = new URLSearchParams(window.location.search);
+        const bizName = params.get('negocio') || 'tu negocio';
+        document.getElementById('nombre-negocio').innerText = bizName;
+
+        // WhatsApp configured via n8n backend automatically
+    </script>
+</body>
+
+</html>

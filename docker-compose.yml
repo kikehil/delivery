@@ -1,0 +1,80 @@
+services:
+  # Backend: Laravel API
+  backend:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: yalopido_backend
+    volumes:
+      - ./backend:/var/www/html
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=yalopido_db
+      - DB_USERNAME=root
+      - DB_PASSWORD=root_password
+    depends_on:
+      - db
+      - redis
+    networks:
+      - yalopido_net
+
+  # Frontend: Next.js
+  frontend:
+    build:
+      context: ./docker/nextjs
+      dockerfile: Dockerfile
+    container_name: yalopido_frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
+    networks:
+      - yalopido_net
+
+  # Database: MySQL
+  db:
+    image: mysql:8.0
+    container_name: yalopido_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: yalopido_db
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - yalopido_db_data:/var/lib/mysql
+    networks:
+      - yalopido_net
+
+  # Cache/Queue: Redis
+  redis:
+    image: redis:alpine
+    container_name: yalopido_redis
+    networks:
+      - yalopido_net
+
+  # Proxy/Webserver for Backend
+  nginx:
+    image: nginx:alpine
+    container_name: yalopido_nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+    networks:
+      - yalopido_net
+
+networks:
+  yalopido_net:
+    driver: bridge
+
+volumes:
+  yalopido_db_data:

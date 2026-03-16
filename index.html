@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>YaLoPido | Pedir Fácil • Vender Fácil</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-row">
+            <div class="brand-logo">
+                <span style="font-size: 1.5rem; font-weight: 800; color: #0b1c2e;">YaLoPido</span>
+            </div>
+            <div class="header-actions">
+                <div class="location-picker" id="open-address">
+                    <i data-lucide="map-pin" style="color:#000; width:20px;"></i>
+                    <span id="display-address">Seleccionar dirección</span>
+                    <i data-lucide="chevron-down" style="width:16px;"></i>
+                </div>
+                <div class="delivery-type-btn">
+                    <span>Entrega ahora</span>
+                    <i data-lucide="clock" style="width:14px;"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <div class="search-bar-wrapper">
+            <i data-lucide="search" style="width:18px; color:#545454;"></i>
+            <input type="text" id="search-input" class="search-input" placeholder="Comida, platillo o negocio"
+                onfocus="showSearch()" onblur="setTimeout(hideSearch, 200)">
+        </div>
+    </div>
+
+    <!-- Search Overlay Results -->
+    <div id="search-overlay" class="search-overlay">
+        <div id="search-results-container" class="search-results">
+            <!-- Results injected here -->
+        </div>
+    </div>
+
+    <main class="content" id="main-content">
+        <!-- Dynamic Promo Banners -->
+        <div class="promo-banner-container">
+            <div class="promo-banner-slider" id="banner-slider">
+                <!-- Banners injected dynamically -->
+            </div>
+            <div class="banner-dots" id="banner-dots">
+                <!-- Dots injected dynamically -->
+            </div>
+        </div>
+
+        <style>
+            .category-icon.active {
+                background: var(--yalopido-blue);
+                color: white;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+        </style>
+        <!-- Categories Slider -->
+        <div class="category-slider" id="category-slider">
+            <div class="category-item" onclick="filterCategory('Antojitos', this)">
+                <div class="category-icon">🥪</div>
+                <span class="category-name">Antojitos</span>
+            </div>
+            <div class="category-item" onclick="filterCategory('Hotdogs/Hamburguesas', this)">
+                <div class="category-icon">🍔</div>
+                <span class="category-name">Hotdogs/Hamburguesas</span>
+            </div>
+            <div class="category-item" onclick="filterCategory('Pasteles', this)">
+                <div class="category-icon">🍰</div>
+                <span class="category-name">Pasteles</span>
+            </div>
+            <div class="category-item" onclick="filterCategory('Pizza', this)">
+                <div class="category-icon">🍕</div>
+                <span class="category-name">Pizza</span>
+            </div>
+            <div class="category-item" onclick="filterCategory('Pollos', this)">
+                <div class="category-icon">🍗</div>
+                <span class="category-name">Pollos</span>
+            </div>
+            <div class="category-item" onclick="filterCategory('Snack', this)">
+                <div class="category-icon">🍟</div>
+                <span class="category-name">Snack</span>
+            </div>
+            <div class="category-item" onclick="filterCategory('Tacos/Tortas', this)">
+                <div class="category-icon">🌮</div>
+                <span class="category-name">Tacos/Tortas</span>
+            </div>
+        </div>
+
+        <h2 class="feed-title">Todas las tiendas</h2>
+
+        <!-- Restaurant Grid -->
+        <div id="merchant-feed" class="merchant-grid">
+            <!-- Skeletons while loading -->
+            <div class="merchant-card">
+                <div class="card-img skeleton"></div>
+                <div class="card-info">
+                    <div class="skeleton" style="height: 20px; width: 60%; margin-bottom: 8px;"></div>
+                    <div class="skeleton" style="height: 14px; width: 40%;"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Floating Cart Button -->
+    <button id="floating-cart" class="floating-cart-btn" onclick="openCheckout()">
+        <span>Ver carrito</span>
+        <span id="cart-count-pill" style="background:#048848; padding: 2px 8px; border-radius: 4px;">0</span>
+        <span id="cart-total-pill">$0.00</span>
+    </button>
+
+    <!-- Toast Container -->
+    <div id="toast-container"
+        style="position:fixed; bottom:90px; left:50%; transform:translateX(-50%); z-index:9999; display:flex; flex-direction:column; align-items:center; gap:8px; pointer-events:none;">
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-drawer" class="uber-modal">
+        <div class="modal-content">
+            <div class="checkout-header">
+                <h2>Tu pedido</h2>
+                <button onclick="closeCheckout()"
+                    style="background:none; border:none; font-size: 1.5rem;">&times;</button>
+            </div>
+            <div id="checkout-items" class="checkout-items"></div>
+
+            <!-- Modality Selector -->
+            <div id="modality-selector" class="modality-selector"
+                style="margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 12px;">
+                <h4
+                    style="font-size: 0.8rem; text-transform: uppercase; color: #666; margin-bottom: 15px; letter-spacing: 0.5px;">
+                    ¿Cómo quieres recibir tu pedido?</h4>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;" id="modality-container">
+                    <!-- Dynamic buttons injected here -->
+                </div>
+            </div>
+
+            <!-- Coupon Section -->
+            <div class="coupon-section">
+                <label class="coupon-label">¿Tienes un código de promoción?</label>
+                <div class="coupon-input-wrapper">
+                    <input type="text" id="coupon-code" class="coupon-input" placeholder="Ej: HOLAPANUCO">
+                    <button type="button" class="btn-apply-coupon" onclick="applyCoupon()">Aplicar</button>
+                </div>
+                <div id="coupon-message" class="coupon-msg"></div>
+            </div>
+
+            <div class="checkout-summary">
+                <div class="summary-row"><span>Subtotal</span><span id="check-subtotal">$0.00</span></div>
+                <div class="summary-row discount-row" id="row-discount"><span>Descuento</span><span
+                        id="check-discount">-$0.00</span></div>
+                <div class="summary-row"><span>Costo de envío</span><span id="check-shipping">$0.00</span></div>
+                <div class="summary-row total-row"><span>Total</span><span id="check-total">$0.00</span></div>
+            </div>
+            <button class="uber-btn btn-confirm" onclick="submitOrder()">Confirmar pedido</button>
+        </div>
+    </div>
+
+    <!-- Address Drawer -->
+    <div id="address-drawer" class="drawer">
+        <div class="drawer-header">
+            <button onclick="closeAddressDrawer()" style="background:none; border:none;"><i
+                    data-lucide="arrow-left"></i></button>
+            <h3>Dirección de entrega</h3>
+        </div>
+        <!-- GPS Button -->
+        <button id="btn-gps" onclick="useMyLocation()" style="
+            width: 100%; padding: 14px; margin-bottom: 1rem;
+            background: #0b1c2e; color: white; border: none;
+            border-radius: 12px; font-weight: 700; font-size: 0.95rem;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            cursor: pointer; transition: opacity 0.2s;
+        ">
+            <i data-lucide="navigation" style="width:18px;"></i>
+            <span id="gps-btn-text">Usar mi ubicación actual</span>
+        </button>
+        <p style="text-align:center; color:#999; font-size:0.8rem; margin-bottom:1rem;">— o elige tu colonia —</p>
+        <div id="zone-list" class="zone-list-full"></div>
+    </div>
+
+    <!-- Store Drawer -->
+    <div id="store-drawer" class="drawer">
+        <div class="drawer-header" style="position: sticky; top: 0; background: white; z-index: 10;">
+            <button onclick="closeStoreDrawer()" style="background:none; border:none;"><i
+                    data-lucide="arrow-left"></i></button>
+            <h3 id="store-name-display">Menú</h3>
+        </div>
+        <div id="store-product-list" class="store-product-list" style="padding: 20px;">
+            <!-- Products injected here -->
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="product-modal" class="uber-modal">
+        <div class="modal-content">
+            <div style="text-align:right;"><button onclick="closeProduct()"
+                    style="background:none; border:none; font-size: 1.5rem;">&times;</button></div>
+            <img id="p-img" src=""
+                style="width:100%; height:200px; object-fit:cover; border-radius: 8px; margin-bottom: 1rem;">
+            <h2 id="p-title"></h2>
+            <p id="p-desc" style="color:#666; font-size:0.9rem; margin-bottom: 1rem;"></p>
+
+            <div id="p-complements-section"
+                style="margin-top: 1rem; border-top: 1px solid #eee; padding-top: 1rem; display:none;">
+                <h4 style="font-size: 0.85rem; text-transform:uppercase; color:#666; margin-bottom: 1rem;">Elige tus
+                    complementos</h4>
+                <div id="p-complements-list"
+                    style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.5rem;"></div>
+            </div>
+
+            <div id="p-instructions-section"
+                style="margin-top: 1rem; border-top: 1px solid #eee; padding-top: 1rem; margin-bottom: 1.5rem;">
+                <h4 style="font-size: 0.85rem; text-transform:uppercase; color:#666; margin-bottom: 0.5rem;">
+                    Instrucciones Especiales</h4>
+                <textarea id="p-instructions" placeholder="Ej: Sin cebolla, extra aderezo..."
+                    style="width: 100%; height: 60px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; resize: none; font-size: 0.9rem;"></textarea>
+            </div>
+
+            <div style="display:flex; justify-content: space-between; align-items: center; margin: 1.5rem 0;">
+                <div style="display:flex; align-items:center; gap: 1.5rem;">
+                    <button class="rating-badge" onclick="updateQty(-1)">-</button>
+                    <span id="p-qty">1</span>
+                    <button class="rating-badge" onclick="updateQty(1)">+</button>
+                </div>
+                <div id="p-price" style="font-weight:700; font-size: 1.2rem;"></div>
+            </div>
+            <button class="uber-btn" onclick="addToCart()">Agregar al carrito</button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let cart = JSON.parse(localStorage.getItem('nm_cart')) || [];
+        let activeProduct = null;
+        let qty = 1;
+        let selectedMerchant = null;
+        let currentCategory = '';
+        let searchTimeout = null;
+        let appliedCoupon = null; // Store active coupon
+
+        // Load Promos
+        async function loadPromos() {
+            try {
+                const res = await fetch('get_promociones.php');
+                const json = await res.json();
+                if (json.status === 'success' && json.data.length > 0) {
+                    const slider = document.getElementById('banner-slider');
+                    const dotsWrap = document.getElementById('banner-dots');
+                    slider.innerHTML = '';
+                    dotsWrap.innerHTML = '';
+
+                    json.data.forEach((p, i) => {
+                        // Create slide
+                        const slide = document.createElement('div');
+                        slide.className = 'banner-slide';
+
+                        let tagHtml = '';
+                        if (p.etiqueta && p.etiqueta.trim() !== '') {
+                            tagHtml = `<span class="banner-tag">${p.etiqueta}</span>`;
+                        }
+
+                        let subtitleHtml = '';
+                        if (p.subtitulo && p.subtitulo.trim() !== '') {
+                            subtitleHtml = `<p class="banner-subtitle">${p.subtitulo}</p>`;
+                        }
+
+                        slide.innerHTML = `
+                            <img src="${p.imagen_url}" class="banner-img">
+                            <div class="banner-content">
+                                ${tagHtml}
+                                <h3 class="banner-title">${p.titulo}</h3>
+                                ${subtitleHtml}
+                            </div>
+                        `;
+                        slider.appendChild(slide);
+
+                        // Create dot
+                        const dot = document.createElement('div');
+                        dot.className = 'dot' + (i === 0 ? ' active' : '');
+                        dotsWrap.appendChild(dot);
+                    });
+
+                    // Basic auto-scroll or dot logic could go here if needed.
+                } else {
+                    document.querySelector('.promo-banner-container').style.display = 'none';
+                }
+            } catch (e) { console.error('Error loading promos'); }
+        }
+
+        // --- Search Logic ---
+        function showSearch() {
+            document.getElementById('search-overlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideSearch() {
+            if (document.activeElement.id === 'search-input') return;
+            document.getElementById('search-overlay').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const query = e.target.value;
+            clearTimeout(searchTimeout);
+
+            if (query.length < 2) {
+                document.getElementById('search-results-container').innerHTML = '';
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                performSearch(query);
+            }, 300);
+        });
+
+        async function performSearch(q) {
+            const zone = JSON.parse(localStorage.getItem('nm_zona')) || { id: 1 };
+            const container = document.getElementById('search-results-container');
+
+            try {
+                const res = await fetch(`search.php?q=${encodeURIComponent(q)}&zoneId=${zone.id}`);
+                const json = await res.json();
+
+                if (json.status === 'success' && json.data.length > 0) {
+                    renderSearchResults(json.data);
+                } else {
+                    renderNoResults();
+                }
+            } catch (e) {
+                console.error("Search Error", e);
+            }
+        }
+
+        function renderSearchResults(results) {
+            const container = document.getElementById('search-results-container');
+            container.innerHTML = '';
+            results.forEach(item => {
+                const isClosed = parseInt(item.modulo_abierto) === 0;
+                const div = document.createElement('div');
+                div.className = 'search-result-item' + (isClosed ? ' closed' : '');
+                div.innerHTML = `
+                    <img src="${item.logo_url || 'https://via.placeholder.com/48'}" class="result-thumb">
+                    <div class="result-info">
+                        <h4>${item.nombre} ${isClosed ? '(Cerrado)' : ''}</h4>
+                        <span>${item.categoria} ${item.plan === 'elite' ? '• Selección Urbix' : ''}</span>
+                    </div>
+                `;
+                div.onclick = () => {
+                    document.getElementById('search-input').value = item.nombre;
+                    hideSearch();
+                    openStore(item);
+                };
+                container.appendChild(div);
+            });
+        }
+
+        function renderNoResults() {
+            const container = document.getElementById('search-results-container');
+            container.innerHTML = `
+                <div class="no-results">
+                    <h3>No encontramos ese sabor por aquí</h3>
+                    <p>Pero puedes probar estas opciones recomendadas:</p>
+                    <div id="search-recommendations" class="merchant-grid"></div>
+                </div>
+            `;
+            // Suggest Elite merchants
+            fetch(`get_feed.php?zona=${JSON.parse(localStorage.getItem('nm_zona') || '{}').id || 1}`)
+                .then(r => r.json())
+                .then(j => {
+                    const rec = document.getElementById('search-recommendations');
+                    j.data.filter(m => m.plan === 'elite').forEach(m => {
+                        const d = document.createElement('div');
+                        d.className = 'search-result-item';
+                        d.innerHTML = `
+                            <img src="${m.img || 'https://via.placeholder.com/48'}" class="result-thumb">
+                            <div class="result-info">
+                                <h4>${m.nombre}</h4>
+                                <span>Recomendado</span>
+                            </div>
+                        `;
+                        d.onclick = () => { hideSearch(); openStore(m); };
+                        rec.appendChild(d);
+                    });
+                });
+        }
+
+        // --- Core UI & Logic ---
+        function openAddressDrawer() { document.getElementById('address-drawer').style.display = 'flex'; loadZones(); }
+        function closeAddressDrawer() { document.getElementById('address-drawer').style.display = 'none'; }
+
+        function openStoreDrawer() { document.getElementById('store-drawer').style.display = 'flex'; }
+        function closeStoreDrawer() { document.getElementById('store-drawer').style.display = 'none'; }
+
+        document.getElementById('open-address').onclick = openAddressDrawer;
+
+        loadPromos(); // Fetch banners on start
+
+        async function loadZones() {
+            const list = document.getElementById('zone-list');
+            try {
+                const res = await fetch('get_zonas_nm.php');
+                const json = await res.json();
+                if (json.status === 'success') {
+                    list.innerHTML = '';
+                    // Store zones globally for geolocation matching
+                    window._allZones = json.data;
+                    json.data.forEach(z => {
+                        const div = document.createElement('div');
+                        div.className = 'zone-entry';
+                        div.innerHTML = `<i data-lucide="map-pin" style="width:18px;"></i> <div><b>${z.nombre_colonia}</b><br><small>Envío: $${z.costo_envio}</small></div>`;
+                        div.onclick = () => setZone(z);
+                        list.appendChild(div);
+                    });
+                    lucide.createIcons();
+                }
+            } catch (e) { }
+        }
+
+        async function useMyLocation() {
+            if (!navigator.geolocation) {
+                showToast('Tu navegador no soporta geolocalización');
+                return;
+            }
+            const btn = document.getElementById('btn-gps');
+            const btnText = document.getElementById('gps-btn-text');
+            btnText.innerText = 'Obteniendo ubicación...';
+            btn.disabled = true;
+
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const { latitude, longitude } = pos.coords;
+                try {
+                    // Reverse geocode with OpenStreetMap (free, no API key)
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=es`);
+                    const geo = await res.json();
+                    const addr = geo.address;
+                    // Build a readable address string
+                    const street = addr.road || addr.pedestrian || addr.neighbourhood || '';
+                    const suburb = addr.suburb || addr.neighbourhood || addr.quarter || addr.village || addr.town || addr.city || '';
+                    const fullAddress = [street, suburb].filter(Boolean).join(', ');
+
+                    // Try to match against available zones
+                    const zones = window._allZones || [];
+                    const matched = zones.find(z => {
+                        const zName = z.nombre_colonia.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                        const subNorm = suburb.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                        return subNorm.includes(zName) || zName.includes(subNorm);
+                    });
+
+                    if (matched) {
+                        // Auto-select the matched zone
+                        showToast(`📍 Zona detectada: ${matched.nombre_colonia}`);
+                        setZone(matched);
+                    } else {
+                        // No zone match — save GPS address as free-text and load all merchants
+                        const fakeZone = { id: zones[0]?.id || 1, nombre_colonia: fullAddress || suburb, costo_envio: zones[0]?.costo_envio || 0 };
+                        showToast(`📍 ${fullAddress || suburb}`);
+                        setZone(fakeZone);
+                    }
+                } catch (e) {
+                    showToast('No se pudo obtener tu dirección. Elige una colonia.');
+                }
+                btnText.innerText = 'Usar mi ubicación actual';
+                btn.disabled = false;
+            }, (err) => {
+                const messages = {
+                    1: 'Permiso de ubicación denegado. Elige una colonia manualmente.',
+                    2: 'No se pudo obtener tu posición.',
+                    3: 'Tiempo de espera agotado.'
+                };
+                showToast(messages[err.code] || 'Error de geolocalización');
+                btnText.innerText = 'Usar mi ubicación actual';
+                btn.disabled = false;
+            }, { timeout: 10000, enableHighAccuracy: true });
+        }
+
+        function setZone(z) {
+            localStorage.setItem('nm_zona', JSON.stringify(z));
+            document.getElementById('display-address').innerText = z.nombre_colonia;
+            closeAddressDrawer();
+            loadMerchants(z.id);
+        }
+
+        function filterCategory(cat, element) {
+            const items = document.querySelectorAll('#category-slider .category-icon');
+            items.forEach(el => el.classList.remove('active'));
+
+            if (currentCategory === cat) {
+                currentCategory = ''; // toggle off
+            } else {
+                currentCategory = cat;
+                const icon = element.querySelector('.category-icon');
+                if (icon) icon.classList.add('active');
+            }
+            const z = JSON.parse(localStorage.getItem('nm_zona'));
+            if (z) loadMerchants(z.id);
+        }
+
+        async function loadMerchants(zoneId) {
+            const feed = document.getElementById('merchant-feed');
+            try {
+                let url = 'get_feed.php?zona=' + zoneId;
+                if (currentCategory) {
+                    url += '&categoria=' + encodeURIComponent(currentCategory);
+                }
+                const res = await fetch(url);
+                const json = await res.json();
+                if (json.status === 'success') renderMerchants(json.data);
+            } catch (e) { }
+        }
+
+        function renderMerchants(data) {
+            const feed = document.getElementById('merchant-feed');
+            feed.innerHTML = '';
+            data.forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'merchant-card' + (parseInt(m.modulo_abierto) === 0 ? ' closed' : '');
+                div.innerHTML = `
+                    <img src="${m.img || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80'}" class="card-img">
+                    <div class="card-info">
+                        <div class="merchant-header">
+                            <h3 class="merchant-name">${m.nombre}</h3>
+                            <span class="rating-badge">⭐ 4.8</span>
+                        </div>
+                        <div class="merchant-meta"><span>${m.categoria}</span> • <span>$0 envío</span> • <span>20-30 min</span></div>
+                        ${m.plan === 'elite' ? '<div class="elite-label"><i data-lucide="award" style="width:12px;"></i> SELECCIÓN URBIX</div>' : ''}
+                    </div>
+                `;
+                div.onclick = () => openStore(m);
+                feed.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        async function openStore(m) {
+            selectedMerchant = m;
+            const res = await fetch(`get_productos.php?id_comercio=${m.id}`);
+            const json = await res.json();
+
+            if (json.status === 'success' && json.data.length > 0) {
+                document.getElementById('store-name-display').innerText = m.nombre;
+                renderStoreProducts(json.data);
+                openStoreDrawer();
+            } else {
+                alert('Este negocio aún no tiene productos disponibles.');
+            }
+        }
+
+        function renderStoreProducts(products) {
+            const container = document.getElementById('store-product-list');
+            container.innerHTML = '';
+
+            products.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'search-result-item'; // Reuse style
+                div.style.marginBottom = '15px';
+                div.style.padding = '10px';
+                div.style.border = '1px solid #f0f0f0';
+                div.style.borderRadius = '12px';
+                div.innerHTML = `
+                    <img src="${p.foto_url || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&q=80'}" class="result-thumb" style="width:80px; height:80px; border-radius:8px;">
+                    <div class="result-info">
+                        <h4 style="font-size:1rem; margin-bottom:4px;">${p.nombre}</h4>
+                        <p style="font-size:0.8rem; color:#666; margin-bottom:4px;">${p.descripcion || ''}</p>
+                        <b style="font-size:0.9rem;">$${parseFloat(p.precio).toFixed(2)}</b>
+                    </div>
+                `;
+                div.onclick = () => showProductModal(p);
+                container.appendChild(div);
+            });
+        }
+
+        function showProductModal(p) {
+            activeProduct = {
+                id: p.id,
+                nombre: p.nombre,
+                precio: parseFloat(p.precio),
+                desc: p.descripcion,
+                img: p.foto_url || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80',
+                complementos_raw: p.complementos
+            };
+
+            qty = 1;
+            document.getElementById('p-title').innerText = activeProduct.nombre;
+            document.getElementById('p-desc').innerText = activeProduct.desc;
+            document.getElementById('p-price').innerText = `$${activeProduct.precio.toFixed(2)}`;
+            document.getElementById('p-qty').innerText = qty;
+            document.getElementById('p-img').src = activeProduct.img;
+            document.getElementById('p-instructions').value = '';
+
+            // Render Complements
+            const compSection = document.getElementById('p-complements-section');
+            const compList = document.getElementById('p-complements-list');
+            compList.innerHTML = '';
+
+            if (p.complementos) {
+                try {
+                    const comps = JSON.parse(p.complementos);
+                    if (Array.isArray(comps) && comps.length > 0) {
+                        compSection.style.display = 'block';
+                        comps.forEach(c => {
+                            if (!c || !c.nombre) return;
+                            const priceTag = parseFloat(c.precio) > 0 ? ` +$${parseFloat(c.precio).toFixed(2)}` : '';
+                            const d = document.createElement('div');
+                            d.style.display = 'flex';
+                            d.style.alignItems = 'center';
+                            d.style.gap = '10px';
+                            d.style.background = '#f9f9f9';
+                            d.style.padding = '12px';
+                            d.style.borderRadius = '10px';
+                            d.innerHTML = `
+                                <input type="checkbox" class="comp-check" 
+                                    data-nombre="${c.nombre}" 
+                                    data-precio="${c.precio}" 
+                                    onchange="updateQty(0)"
+                                    id="comp-${c.nombre}" style="width:18px; height:18px;">
+                                <label for="comp-${c.nombre}" style="flex:1; font-size:0.9rem;">${c.nombre} <b style="float:right;">${priceTag}</b></label>
+                            `;
+                            compList.appendChild(d);
+                        });
+                    } else { compSection.style.display = 'none'; }
+                } catch (e) { compSection.style.display = 'none'; }
+            } else { compSection.style.display = 'none'; }
+
+            document.getElementById('product-modal').style.display = 'flex';
+            setTimeout(() => document.getElementById('product-modal').classList.add('active'), 10);
+        }
+
+        function closeProduct() {
+            document.getElementById('product-modal').classList.remove('active');
+            setTimeout(() => document.getElementById('product-modal').style.display = 'none', 400);
+        }
+
+        function updateQty(d) {
+            qty = Math.max(1, qty + d);
+            const compTotal = Array.from(document.querySelectorAll('.comp-check:checked'))
+                .reduce((a, cb) => a + (parseFloat(cb.getAttribute('data-precio')) || 0), 0);
+
+            document.getElementById('p-qty').innerText = qty;
+            document.getElementById('p-price').innerText = `$${((activeProduct.precio + compTotal) * qty).toFixed(2)}`;
+        }
+
+        function addToCart() {
+            const selectedComps = Array.from(document.querySelectorAll('.comp-check:checked')).map(cb => ({
+                nombre: cb.getAttribute('data-nombre'),
+                precio: parseFloat(cb.getAttribute('data-precio')) || 0
+            }));
+            const instrucciones = document.getElementById('p-instructions').value.trim();
+            cart.push({ ...activeProduct, qty, complementos: selectedComps, instrucciones: instrucciones, merchant: selectedMerchant });
+            localStorage.setItem('nm_cart', JSON.stringify(cart));
+            updateFloatingCart();
+            showToast(`✅ ${activeProduct.nombre} agregado al carrito`);
+            closeProduct();
+        }
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.innerText = msg;
+            toast.style.cssText = `
+                background: #0b1c2e;
+                color: #fff;
+                padding: 12px 20px;
+                border-radius: 50px;
+                font-size: 0.9rem;
+                font-weight: 600;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+                opacity: 0;
+                transform: translateY(10px);
+                transition: all 0.3s ease;
+                white-space: nowrap;
+                pointer-events: none;
+            `;
+            container.appendChild(toast);
+            // Animate in
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    toast.style.opacity = '1';
+                    toast.style.transform = 'translateY(0)';
+                });
+            });
+            // Animate out & remove
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-10px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        function updateFloatingCart() {
+            const btn = document.getElementById('floating-cart');
+            if (cart.length > 0) {
+                btn.style.display = 'flex';
+                document.getElementById('cart-count-pill').innerText = cart.reduce((a, b) => a + b.qty, 0);
+                const total = cart.reduce((a, b) => {
+                    const ct = b.complementos ? b.complementos.reduce((acc, curr) => acc + (curr.precio || 0), 0) : 0;
+                    return a + ((b.precio + ct) * b.qty);
+                }, 0);
+                document.getElementById('cart-total-pill').innerText = `$${total.toFixed(2)}`;
+            } else {
+                btn.style.display = 'none';
+            }
+        }
+
+        function openCheckout() {
+            // Recover selectedMerchant from cart if it was lost on page reload
+            if (!selectedMerchant && cart.length > 0 && cart[0].merchant) {
+                selectedMerchant = cart[0].merchant;
+            }
+            renderCheckout();
+            document.getElementById('checkout-drawer').style.display = 'flex';
+            setTimeout(() => document.getElementById('checkout-drawer').classList.add('active'), 10);
+        }
+
+        function closeCheckout() {
+            document.getElementById('checkout-drawer').classList.remove('active');
+            setTimeout(() => document.getElementById('checkout-drawer').style.display = 'none', 400);
+        }
+
+        let selectedModality = 'delivery'; // Default
+
+        function renderCheckout() {
+            const container = document.getElementById('checkout-items');
+            const zone = JSON.parse(localStorage.getItem('nm_zona')) || { costo_envio: 0 };
+            container.innerHTML = '';
+            let sub = 0;
+            cart.forEach((it, i) => {
+                const compTotal = it.complementos ? it.complementos.reduce((a, b) => a + (b.precio || 0), 0) : 0;
+                const itemTotal = (it.precio + compTotal) * it.qty;
+                sub += itemTotal;
+
+                const compStr = it.complementos && it.complementos.length > 0
+                    ? `<br><small style="color:#666">+ ${it.complementos.map(c => c.nombre).join(', ')}</small>`
+                    : '';
+                const instStr = it.instrucciones ? `<br><small style="color:#e05b00; font-style:italic;">Nota: ${it.instrucciones}</small>` : '';
+
+                container.innerHTML += `<div class="checkout-item"><div><b>${it.qty}x ${it.nombre}</b>${compStr}${instStr}<br><small onclick="remove(${i})" style="color:red; cursor:pointer;">Quitar</small></div><b>$${itemTotal.toFixed(2)}</b></div>`;
+            });
+
+            // Render Modality Buttons
+            const modContainer = document.getElementById('modality-container');
+            modContainer.innerHTML = '';
+
+            const m = selectedMerchant || (cart.length > 0 ? cart[0].merchant : null);
+            if (m) {
+                const options = [
+                    { id: 'delivery', label: 'Entrega a Domicilio', active: !!parseInt(m.entrega_domicilio), icon: 'bike' },
+                    { id: 'pickup', label: 'Para llevar (Recolecta)', active: !!parseInt(m.recolecta_pedidos), icon: 'shopping-bag' },
+                    { id: 'dinein', label: 'Consumir en Local', active: !!parseInt(m.consumo_sucursal), icon: 'utensils' }
+                ];
+
+                // If current selected isn't available, pick first available
+                if (!options.find(o => o.id === selectedModality && o.active)) {
+                    const first = options.find(o => o.active);
+                    if (first) selectedModality = first.id;
+                }
+
+                options.forEach(opt => {
+                    if (opt.active) {
+                        const btn = document.createElement('div');
+                        btn.style.cssText = `
+                            flex: 1; min-width: 100px; padding: 12px; border-radius: 10px;
+                            border: 2px solid ${selectedModality === opt.id ? '#0b1c2e' : '#eee'};
+                            background: ${selectedModality === opt.id ? '#0b1c2e' : 'white'};
+                            color: ${selectedModality === opt.id ? 'white' : '#0b1c2e'};
+                            text-align: center; cursor: pointer; transition: 0.2s;
+                            display: flex; flex-direction: column; align-items: center; gap: 5px; font-weight: 700; font-size: 0.75rem;
+                        `;
+                        btn.innerHTML = `<i data-lucide="${opt.icon}" style="width:16px;"></i> ${opt.label}`;
+                        btn.onclick = () => { selectedModality = opt.id; renderCheckout(); };
+                        modContainer.appendChild(btn);
+                    }
+                });
+                lucide.createIcons();
+            }
+
+            const ship = (selectedModality === 'delivery') ? (parseFloat(zone.costo_envio) || 0) : 0;
+            let discount = 0;
+
+            if (appliedCoupon) {
+                if (appliedCoupon.tipo === 'fijo') {
+                    discount = appliedCoupon.valor;
+                } else {
+                    discount = sub * (appliedCoupon.valor / 100);
+                }
+                document.getElementById('row-discount').style.display = 'flex';
+                document.getElementById('check-discount').innerText = `-$${discount.toFixed(2)}`;
+            } else {
+                document.getElementById('row-discount').style.display = 'none';
+            }
+
+            const btn = document.querySelector('.btn-confirm');
+            const isClosed = m && parseInt(m.modulo_abierto) === 0;
+
+            if (isClosed) {
+                btn.innerText = 'Cerrado por ahora';
+                btn.disabled = true;
+                btn.style.background = '#ccc';
+            } else {
+                btn.innerText = 'Confirmar pedido';
+                btn.disabled = false;
+                btn.style.background = '';
+            }
+
+            document.getElementById('check-subtotal').innerText = `$${sub.toFixed(2)}`;
+            document.getElementById('check-shipping').innerText = `$${ship.toFixed(2)}`;
+            document.getElementById('check-total').innerText = `$${Math.max(0, (sub + ship - discount)).toFixed(2)}`;
+        }
+
+        async function applyCoupon() {
+            const code = document.getElementById('coupon-code').value.trim();
+            const msgDiv = document.getElementById('coupon-message');
+
+            if (!code) return;
+
+            try {
+                const formData = new FormData();
+                formData.append('codigo', code);
+
+                const res = await fetch('validar_cupon.php', { method: 'POST', body: formData });
+                const json = await res.json();
+
+                if (json.status === 'success') {
+                    appliedCoupon = json;
+                    msgDiv.innerText = `¡Cupón ${json.codigo} aplicado!`;
+                    msgDiv.className = 'coupon-msg success';
+                    document.querySelector('.coupon-section').classList.add('celebrate');
+                    setTimeout(() => document.querySelector('.coupon-section').classList.remove('celebrate'), 400);
+                    renderCheckout();
+                } else {
+                    appliedCoupon = null;
+                    msgDiv.innerText = json.message;
+                    msgDiv.className = 'coupon-msg error';
+                    renderCheckout();
+                }
+            } catch (e) {
+                msgDiv.innerText = 'Error al validar cupón';
+                msgDiv.className = 'coupon-msg error';
+            }
+        }
+
+        function remove(i) {
+            cart.splice(i, 1);
+            localStorage.setItem('nm_cart', JSON.stringify(cart));
+            updateFloatingCart();
+            if (cart.length === 0) closeCheckout(); else renderCheckout();
+        }
+
+        async function submitOrder() {
+            // Recover selectedMerchant from cart if needed
+            if (!selectedMerchant && cart.length > 0 && cart[0].merchant) {
+                selectedMerchant = cart[0].merchant;
+            }
+            if (!selectedMerchant) {
+                alert('No se pudo identificar el negocio. Por favor recarga la página.');
+                return;
+            }
+            if (parseInt(selectedMerchant.modulo_abierto) === 0) {
+                alert('Este negocio se encuentra cerrado por ahora.');
+                return;
+            }
+
+            const btn = document.querySelector('.btn-confirm');
+            btn.innerText = 'Procesando...';
+            btn.disabled = true;
+
+            const zone = JSON.parse(localStorage.getItem('nm_zona')) || { nombre_colonia: 'Desconocido', costo_envio: 0 };
+            const m = selectedMerchant; // Use already-recovered merchant
+
+            // Calculate subtotal including complements
+            const subtotal = cart.reduce((a, b) => {
+                const ct = b.complementos ? b.complementos.reduce((acc, curr) => acc + (parseFloat(curr.precio) || 0), 0) : 0;
+                return a + ((b.precio + ct) * b.qty);
+            }, 0);
+
+            let discount = 0;
+            if (appliedCoupon) {
+                discount = (appliedCoupon.tipo === 'fijo') ? appliedCoupon.valor : (subtotal * (appliedCoupon.valor / 100));
+            }
+            const ship = (selectedModality === 'delivery') ? parseFloat(zone.costo_envio || 0) : 0;
+            const total = Math.max(0, subtotal + ship - discount);
+
+            const orderData = {
+                tipo_evento: 'nuevo_pedido_yalopido',
+                cliente_zona: zone.nombre_colonia,
+                comercio: m.nombre,
+                comercio_id: m.id,
+                items: cart.map(i => ({
+                    id: i.id,
+                    nombre: i.nombre,
+                    qty: i.qty,
+                    precio: i.precio,
+                    complementos: i.complementos,
+                    instrucciones: i.instrucciones
+                })),
+                subtotal: subtotal,
+                descuento: discount,
+                envio: zone.costo_envio,
+                total: total,
+                cupon: appliedCoupon ? appliedCoupon.codigo : null,
+                metodo_entrega: selectedModality,
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                const res = await fetch('enviar_pedido.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderData)
+                });
+                const json = await res.json();
+
+                if (json.status === 'success') {
+                    cart = [];
+                    localStorage.removeItem('nm_cart'); // Vaciar carrito después de pedir
+                    window.location.href = `order-status.php?id=${json.order_id}&uid=${m.id}&type=${selectedModality}`;
+                } else {
+                    alert('Error al procesar pedido: ' + json.message);
+                    btn.innerText = 'Confirmar pedido';
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                alert('Error de conexión con el servidor.');
+                btn.innerText = 'Confirmar pedido';
+                btn.disabled = false;
+            }
+        }
+
+        window.onload = async () => {
+            const z = localStorage.getItem('nm_zona');
+            if (z) {
+                const obj = JSON.parse(z);
+                // Verify if zone still exists
+                const res = await fetch('get_zonas_nm.php');
+                const json = await res.json();
+                const exists = json.data.find(x => x.id === obj.id);
+
+                if (exists) {
+                    document.getElementById('display-address').innerText = obj.nombre_colonia;
+                    loadMerchants(obj.id);
+                } else {
+                    localStorage.removeItem('nm_zona');
+                    openAddressDrawer();
+                }
+                fetch(`log_interaction.php?zona_id=${obj.id}`); // Track activity
+            }
+            else { openAddressDrawer(); }
+            updateFloatingCart();
+            initBannerSlider();
+        };
+
+        // --- Banner Slider Logic ---
+        function initBannerSlider() {
+            const slider = document.getElementById('banner-slider');
+            const dots = document.querySelectorAll('.dot');
+            let isScrolling = false;
+
+            slider.addEventListener('scroll', () => {
+                if (isScrolling) return;
+                const index = Math.round(slider.scrollLeft / slider.offsetWidth);
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
+                });
+            });
+
+            // Auto scroll
+            let current = 0;
+            setInterval(() => {
+                current = (current + 1) % dots.length;
+                const slide = slider.children[current];
+                if (slide) {
+                    slider.scrollTo({
+                        left: slide.offsetLeft - 16, // Adjust for padding
+                        behavior: 'smooth'
+                    });
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+
+</html>

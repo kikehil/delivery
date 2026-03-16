@@ -1,0 +1,258 @@
+{
+    "name": "YaLoPido - Notificacion WhatsApp Nuevo Pedido (Evolution API)",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "pideloya",
+                "responseMode": "onReceived",
+                "options": {}
+            },
+            "id": "a1b2c3d4-0001-0001-0001-000000000001",
+            "name": "Webhook Pedido",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2,
+            "position": [
+                250,
+                300
+            ],
+            "webhookId": "pideloya"
+        },
+        {
+            "parameters": {
+                "mode": "runOnceForAllItems",
+                "jsCode": "// Procesar los items del pedido en un mensaje legible\nconst item = $input.first().json;\n\nconst items = item.items || [];\nlet detalle = items.map(p => {\n  let linea = `  • ${p.qty}x ${p.nombre} — $${(parseFloat(p.precio) * p.qty).toFixed(2)}`;\n  if (p.complementos && p.complementos.length > 0) {\n    linea += `\\n    ➕ ${p.complementos.map(c => c.nombre).join(', ')}`;\n  }\n  if (p.instrucciones) {\n    linea += `\\n    📝 ${p.instrucciones}`;\n  }\n  return linea;\n}).join('\\n');\n\nconst modalidad = {\n  delivery: '🛵 Entrega a Domicilio',\n  pickup:   '🥡 Para llevar',\n  dinein:   '🍽️ Consumo en el Local'\n}[item.metodo_entrega || 'delivery'] || '🛵 Entrega a Domicilio';\n\nconst mensaje = `🔔 *¡Nuevo Pedido #${item.order_id}!*\\n\\n` +\n  `🏪 *Negocio:* ${item.negocio_nombre || 'N/A'}\\n` +\n  `📍 *Zona:* ${item.cliente_zona || 'N/A'}\\n` +\n  `🚀 *Modalidad:* ${modalidad}\\n` +\n  `━━━━━━━━━━━━━━━━━━━━\\n` +\n  `${detalle}\\n` +\n  `━━━━━━━━━━━━━━━━━━━━\\n` +\n  (item.cupon ? `🎟️ *Cupón:* ${item.cupon}\\n` : '') +\n  `💰 *Subtotal:* $${parseFloat(item.subtotal || 0).toFixed(2)}\\n` +\n  (parseFloat(item.descuento || 0) > 0 ? `🔖 *Descuento:* -$${parseFloat(item.descuento).toFixed(2)}\\n` : '') +\n  (parseFloat(item.envio || 0) > 0 ? `🚗 *Envío:* $${parseFloat(item.envio).toFixed(2)}\\n` : '') +\n  `✅ *TOTAL: $${parseFloat(item.total || 0).toFixed(2)}*`;\n\n// Limpiar número de WhatsApp (solo dígitos)\nconst rawNumber = (item.whatsapp_pedidos || item.telefono_contacto || '').replace(/[^0-9]/g, '');\n\nreturn [{\n  json: {\n    ...item,\n    whatsapp_clean: rawNumber,\n    mensaje_formateado: mensaje\n  }\n}];"
+            },
+            "id": "a1b2c3d4-0002-0002-0002-000000000002",
+            "name": "Formatear Mensaje",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                550,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": false,
+                        "leftValue": "",
+                        "typeValidation": "loose"
+                    },
+                    "conditions": [
+                        {
+                            "id": "cond-whatsapp",
+                            "leftValue": "={{ $json.whatsapp_clean }}",
+                            "rightValue": "",
+                            "operator": {
+                                "type": "string",
+                                "operation": "notEmpty",
+                                "singleValue": true
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": {}
+            },
+            "id": "a1b2c3d4-0003-0003-0003-000000000003",
+            "name": "Tiene WhatsApp?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2,
+            "position": [
+                850,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "={{ $vars.EVOLUTION_URL }}/message/sendText/{{ $vars.EVOLUTION_INSTANCE }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        },
+                        {
+                            "name": "apikey",
+                            "value": "={{ $vars.EVOLUTION_APIKEY }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"number\": \"{{ $json.whatsapp_clean }}\",\n  \"text\": \"{{ $json.mensaje_formateado.replace(/\"/g, '\\\\\"') }}\"\n}",
+                "options": {
+                    "timeout": 15000
+                }
+            },
+            "id": "a1b2c3d4-0004-0004-0004-000000000004",
+            "name": "Enviar WhatsApp (Evolution API)",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                1150,
+                180
+            ],
+            "notes": "Usa variables de entorno n8n: EVOLUTION_URL, EVOLUTION_INSTANCE, EVOLUTION_APIKEY"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": false,
+                        "leftValue": "",
+                        "typeValidation": "loose"
+                    },
+                    "conditions": [
+                        {
+                            "id": "cond-success",
+                            "leftValue": "={{ $json.key }}",
+                            "rightValue": "",
+                            "operator": {
+                                "type": "string",
+                                "operation": "notEmpty",
+                                "singleValue": true
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": {}
+            },
+            "id": "a1b2c3d4-0005-0005-0005-000000000005",
+            "name": "Enviado OK?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2,
+            "position": [
+                1450,
+                180
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "runOnceForAllItems",
+                "jsCode": "const item = $input.first().json;\nconsole.log(`✅ WhatsApp enviado correctamente para pedido #${item.order_id || 'N/A'}`);\nreturn [{ json: { status: 'sent', order_id: item.order_id } }];"
+            },
+            "id": "a1b2c3d4-0006-0006-0006-000000000006",
+            "name": "Log - Éxito",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1700,
+                100
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "runOnceForAllItems",
+                "jsCode": "const item = $input.first().json;\nconsole.error(`❌ Error al enviar WhatsApp. Respuesta:`, JSON.stringify(item));\nreturn [{ json: { status: 'error', response: item } }];"
+            },
+            "id": "a1b2c3d4-0007-0007-0007-000000000007",
+            "name": "Log - Error WA",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1700,
+                280
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "runOnceForAllItems",
+                "jsCode": "const item = $input.first().json;\nconsole.log(`⚠️ Pedido #${item.order_id} sin número WhatsApp configurado. comercio_id: ${item.comercio_id}`);\nreturn [{ json: { status: 'no_whatsapp', order_id: item.order_id } }];"
+            },
+            "id": "a1b2c3d4-0008-0008-0008-000000000008",
+            "name": "Log - Sin WhatsApp",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1150,
+                420
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook Pedido": {
+            "main": [
+                [
+                    {
+                        "node": "Formatear Mensaje",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Formatear Mensaje": {
+            "main": [
+                [
+                    {
+                        "node": "Tiene WhatsApp?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Tiene WhatsApp?": {
+            "main": [
+                [
+                    {
+                        "node": "Enviar WhatsApp (Evolution API)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Log - Sin WhatsApp",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Enviar WhatsApp (Evolution API)": {
+            "main": [
+                [
+                    {
+                        "node": "Enviado OK?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Enviado OK?": {
+            "main": [
+                [
+                    {
+                        "node": "Log - Éxito",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Log - Error WA",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "active": true,
+    "settings": {
+        "executionOrder": "v1",
+        "timezone": "America/Mexico_City"
+    },
+    "versionId": "2",
+    "meta": {
+        "instanceId": "yalopido-instance"
+    }
+}

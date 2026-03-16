@@ -1,0 +1,14 @@
+
+Rutas Organizadas: He estructurado las rutas del API en grupos protegidos:
+api/auth/*: Rutas para login/registro.
+api/admin/*: SÓLO accesibles para usuarios con rol admin.
+api/partner/*: SÓLO para dueños de negocios (socio).
+api/customer/*: SÓLO para clientes finales.
+api/stores/*: PÚBLICO (cualquiera puede ver qué hay de comer).
+🧪 Usuarios de Prueba (Listos para usar)
+Como recordatorio, una vez que corras las migraciones, estos serán tus accesos:
+
+Rol	Email	Password
+Admin	admin@yalopido.com	admin123
+Socio	burgerlab@partner.com	socio123
+Cliente	cliente@gmail.com	cliente123
