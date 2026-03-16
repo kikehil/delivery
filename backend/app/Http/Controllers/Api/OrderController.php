@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Pedido;
 use App\Models\Negocio;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class OrderController extends Controller
 {
@@ -30,14 +31,11 @@ class OrderController extends Controller
             $items = $request->items;
             $subtotal = 0;
             
-            // Basic validation: sum up the prices sent (ideally would fetch from DB for each item)
             foreach ($items as $item) {
                 $subtotal += ($item['precio'] * $item['qty']);
             }
 
-            $envio = 0; // Default shipping
-            
-            // Optional: Fetch shipping from zones table
+            $envio = 0;
             $zona = \App\Models\Zona::where('nombre_colonia', $request->cliente_zona)->first();
             if ($zona) {
                 $envio = $zona->costo_envio;
@@ -57,6 +55,25 @@ class OrderController extends Controller
                 'modalidad' => $request->modalidad ?? 'delivery',
                 'estado' => 'pendiente'
             ]);
+
+            // --- Trigger n8n Automation ---
+            try {
+                $webhookUrl = config('services.n8n.webhook_url') ?: 'https://n8n-n8n.amv1ou.easypanel.host/webhook/pideloya';
+                
+                Http::timeout(5)->post($webhookUrl, [
+                    'order_id' => $pedido->id,
+                    'negocio_nombre' => $negocio->nombre,
+                    'whatsapp_negocio' => $negocio->telefono_contacto,
+                    'cliente_zona' => $pedido->cliente_zona,
+                    'subtotal' => $pedido->subtotal,
+                    'envio' => $pedido->envio,
+                    'total' => $pedido->total,
+                    'items' => $items,
+                    'instrucciones' => $pedido->instrucciones
+                ]);
+            } catch (\Exception $webhookEx) {
+                \Log::error("Failed to send order to n8n: " . $webhookEx->getMessage());
+            }
 
             return response()->json([
                 'status' => 'success',

@@ -1,0 +1,80 @@
+{
+  "name": "WhatsApp Order Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "pideloya",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "e3b1c2d3-e4f5-4a6b-8c9d-0e1f2a3b4c5d",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.item.json;\nlet message = `*NUEVO PEDIDO #${input.order_id}*\\n\\n`;\nmessage += `*Negocio:* ${input.negocio_nombre}\\n`;\nmessage += `*Zona:* ${input.cliente_zona}\\n\\n`;\nmessage += `*PRODUCTOS:*\\n`;\n\ninput.items.forEach(item => {\n  message += `- ${item.qty}x ${item.nombre} ($${item.precio * item.qty})\\n`;\n});\n\nmessage += `\\n*Subtotal:* $${input.subtotal}\\n`;\nmessage += `*Envío:* $${input.envio}\\n`;\nmessage += `*TOTAL: $${input.total}*\\n\\n`;\n\nif (input.instrucciones) {\n  message += `*Notas:* ${input.instrucciones}\\n\\n`;\n}\n\nmessage += `_Este es un mensaje automático de la plataforma PedidoYa._`;\n\nreturn {\n  message: message,\n  phone: input.whatsapp_negocio\n};"
+      },
+      "id": "f4a5b6c7-d8e9-4f0a-1b2c-3d4e5f6a7b8c",
+      "name": "Format Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.example.com/send-whatsapp",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.phone }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.message }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "name": "Send WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [750, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Format Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Message": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
