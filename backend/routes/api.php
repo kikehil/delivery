@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\StoreController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,9 @@ Route::get('/stores/{id}/products', [ProductController::class, 'getByStore']);
 
 // Public promotions
 Route::get('/promotions', [App\Http\Controllers\Api\PromocionController::class, 'index']);
+
+// Orders
+Route::post('/orders', [OrderController::class, 'store']);
 
 // User Routes (Logged in)
 Route::group(['middleware' => 'auth:api'], function () {
