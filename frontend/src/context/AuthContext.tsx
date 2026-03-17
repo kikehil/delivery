@@ -28,13 +28,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         async function loadUserFromCookies() {
-            const token = Cookies.get('yalopido_token');
+            const token = Cookies.get('menuvi_token');
             if (token) {
                 try {
                     const { data } = await api.get('/auth/me');
                     setUser(data);
                 } catch (error) {
-                    Cookies.remove('yalopido_token');
+                    Cookies.remove('menuvi_token');
                 }
             }
             setLoading(false);
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const login = (token: string, userData: User) => {
-        Cookies.set('yalopido_token', token, { expires: 7 }); // Expires in 7 days
+        Cookies.set('menuvi_token', token, { expires: 7 }); // Expires in 7 days
         setUser(userData);
 
         // Redirect based on role
@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch (e) {
             // Ignore logout errors
         } finally {
-            Cookies.remove('yalopido_token');
+            Cookies.remove('menuvi_token');
             setUser(null);
             router.push('/login');
         }

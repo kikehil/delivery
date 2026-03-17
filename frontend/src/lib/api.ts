@@ -11,7 +11,7 @@ const api = axios.create({
 // Add a request interceptor to add the JWT token to headers
 api.interceptors.request.use(
     (config) => {
-        const token = Cookies.get('yalopido_token');
+        const token = Cookies.get('menuvi_token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -28,7 +28,7 @@ api.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             // Token expired or invalid
-            Cookies.remove('yalopido_token');
+            Cookies.remove('menuvi_token');
             if (typeof window !== 'undefined') {
                 window.location.href = '/login';
             }

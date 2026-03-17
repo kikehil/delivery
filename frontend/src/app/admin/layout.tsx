@@ -129,7 +129,7 @@ export default function AdminLayout({
                     </button>
 
                     <div className="flex-1 lg:pl-0 pl-1">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 mb-0.5">YaLoPido Control Center</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 mb-0.5">Menuvi Control Center</p>
                         <h2 className="text-lg font-black text-indigo-950">
                             {navItems.find(i => i.path === pathname)?.name || 'Control Panel'}
                         </h2>

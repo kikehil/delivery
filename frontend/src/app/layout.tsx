@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
-  title: "YaLoPido | Pedir Fácil • Vender Fácil",
+  title: "Menuvi | Pedir Fácil • Vender Fácil",
   description: "La plataforma de delivery más rápida de Pánuco",
 };
 

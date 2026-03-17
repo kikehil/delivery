@@ -19,6 +19,7 @@ import {
     Utensils
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import api from '@/lib/api';
 
 export default function PartnerRegisterPage() {
@@ -101,7 +102,15 @@ export default function PartnerRegisterPage() {
                 <div className="absolute inset-0 bg-cyan-500/10 -z-10 blur-[120px] rounded-full scale-150 transform translate-x-1/2" />
                 
                 <div>
-                    <span className="text-2xl font-black text-white tracking-widest uppercase">YaLoPido</span>
+                    <Link href="/" className="relative block h-12 w-40">
+                        <Image 
+                            src="/logo1.png" 
+                            alt="Menuvi Logo" 
+                            fill 
+                            className="object-contain object-left"
+                            priority
+                        />
+                    </Link>
                 </div>
 
                 <div className="space-y-6">

@@ -18,7 +18,7 @@ export default function AdminPayments() {
                 <div className="pt-6">
                     <span className="p-4 bg-indigo-950 text-white rounded-3xl font-black text-sm uppercase tracking-widest flex items-center gap-3 w-fit mx-auto shadow-2xl shadow-indigo-500/30">
                         <ShieldCheck size={20} className="text-indigo-400" />
-                        Seguridad YaLoPido 256-bit
+                        Seguridad Menuvi 256-bit
                     </span>
                 </div>
             </div>

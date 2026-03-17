@@ -160,25 +160,9 @@ export default function StoreMenuPage() {
             const res = await api.post('/orders', orderData);
             
             if (res.data.status === 'success') {
-                // Prepare WhatsApp message
-                const orderId = res.data.data.id;
-                let message = `*NUEVO PEDIDO #${orderId}*\n\n`;
-                message += `*Cliente:* (Desde la App)\n`;
-                message += `*Zona:* ${selectedZone}\n\n`;
-                message += `*PRODUCTOS:*\n`;
-                cartItems.forEach(item => {
-                    message += `- ${item.qty}x ${item.nombre} ($${item.precio * item.qty})\n`;
-                });
-                message += `\n*TOTAL: $${subtotal}*\n\n`;
-                message += `_Por favor confirma mi pedido._`;
-
-                const encodedMessage = encodeURIComponent(message);
-                const whatsappUrl = `https://wa.me/${store.telefono_contacto}?text=${encodedMessage}`;
-                
-                window.open(whatsappUrl, '_blank');
                 setShowCart(false);
                 setCartItems([]);
-                alert('¡Pedido enviado con éxito!');
+                alert('¡Pedido enviado con éxito! Recibirás una confirmación por WhatsApp en breve.');
             }
         } catch (e) {
             console.error('Error creating order', e);
@@ -594,7 +578,7 @@ export default function StoreMenuPage() {
                                 </button>
                                 
                                 <p className="text-center text-[10px] font-bold text-white/20 uppercase tracking-widest">
-                                    Serás redirigido a WhatsApp para finalizar
+                                    Recibirás una notificación automática por WhatsApp
                                 </p>
                             </div>
                         </motion.div>

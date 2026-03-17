@@ -79,7 +79,15 @@ export default function Home() {
       <header className="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-white/5 px-4 py-4">
         <div className="max-w-7xl mx-auto flex flex-col gap-5">
           <div className="flex items-center justify-between">
-            <span className="text-2xl font-black text-white tracking-tighter">YaLoPido</span>
+            <Link href="/" className="relative h-10 w-32">
+              <Image 
+                src="/logo1.png" 
+                alt="Menuvi Logo" 
+                fill 
+                className="object-contain object-left"
+                priority
+              />
+            </Link>
             <div className="flex items-center gap-4">
               <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/5 rounded-2xl cursor-pointer hover:bg-white/10 transition-all border border-white/5">
                 <MapPin size={16} className="text-cyan-400" />

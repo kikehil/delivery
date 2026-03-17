@@ -162,7 +162,7 @@ export default function PartnerDashboard() {
                     <div className="group p-6 rounded-3xl bg-slate-50 hover:bg-slate-900 transition-all duration-300 cursor-pointer">
                         <AlertCircle size={32} className="text-slate-900 group-hover:text-white transition-colors mb-4" />
                         <p className="font-black text-slate-900 group-hover:text-white transition-colors">Soporte Técnico</p>
-                        <p className="text-xs font-bold text-slate-500 group-hover:text-slate-400 transition-colors">Ayuda 24/7 de YaLoPido</p>
+                        <p className="text-xs font-bold text-slate-500 group-hover:text-slate-400 transition-colors">Ayuda 24/7 de Menuvi</p>
                     </div>
                 </div>
             </div>

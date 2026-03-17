@@ -12,22 +12,28 @@
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
-      "position": [250, 300]
+      "position": [
+        250,
+        300
+      ]
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.item.json;\nlet message = `*NUEVO PEDIDO #${input.order_id}*\\n\\n`;\nmessage += `*Negocio:* ${input.negocio_nombre}\\n`;\nmessage += `*Zona:* ${input.cliente_zona}\\n\\n`;\nmessage += `*PRODUCTOS:*\\n`;\n\ninput.items.forEach(item => {\n  message += `- ${item.qty}x ${item.nombre} ($${item.precio * item.qty})\\n`;\n});\n\nmessage += `\\n*Subtotal:* $${input.subtotal}\\n`;\nmessage += `*Envío:* $${input.envio}\\n`;\nmessage += `*TOTAL: $${input.total}*\\n\\n`;\n\nif (input.instrucciones) {\n  message += `*Notas:* ${input.instrucciones}\\n\\n`;\n}\n\nmessage += `_Este es un mensaje automático de la plataforma PedidoYa._`;\n\nreturn {\n  message: message,\n  phone: input.whatsapp_negocio\n};"
+        "jsCode": "const input = $input.item.json;\nlet message = `*NUEVO PEDIDO #${input.order_id}*\\n\\n`;\nmessage += `*Negocio:* ${input.negocio_nombre}\\n`;\nmessage += `*Zona:* ${input.cliente_zona}\\n\\n`;\nmessage += `*PRODUCTOS:*\\n`;\n\ninput.items.forEach(item => {\n  message += `- ${item.qty}x ${item.nombre} ($${item.precio * item.qty})\\n`;\n});\n\nmessage += `\\n*Subtotal:* $${input.subtotal}\\n`;\nmessage += `*Envío:* $${input.envio}\\n`;\nmessage += `*TOTAL: $${input.total}*\\n\\n`;\n\nif (input.instrucciones) {\n  message += `*Notas:* ${input.instrucciones}\\n\\n`;\n}\n\nmessage += `_Este es un mensaje automático de la plataforma Menuvi._`;\n\nreturn {\n  message: message,\n  phone: input.whatsapp_negocio\n};"
       },
       "id": "f4a5b6c7-d8e9-4f0a-1b2c-3d4e5f6a7b8c",
       "name": "Format Message",
       "type": "n8n-nodes-base.code",
       "typeVersion": 1,
-      "position": [500, 300]
+      "position": [
+        500,
+        300
+      ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://api.example.com/send-whatsapp",
+        "url": "https://n8n-n8n.amv1ou.easypanel.host/webhook/delivery",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -47,7 +53,10 @@
       "name": "Send WhatsApp",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 3,
-      "position": [750, 300]
+      "position": [
+        750,
+        300
+      ]
     }
   ],
   "connections": {

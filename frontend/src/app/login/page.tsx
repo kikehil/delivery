@@ -6,6 +6,7 @@ import api from '@/lib/api';
 import { motion } from 'framer-motion';
 import { Mail, Lock, AlertCircle, ArrowRight, Store } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -51,7 +52,15 @@ export default function LoginPage() {
             >
                 <div className="bg-[#1a1a1a] rounded-[3rem] shadow-2xl border border-white/5 overflow-hidden">
                     <div className="p-10 pb-6 text-center">
-                        <Link href="/" className="inline-block text-3xl font-black text-white tracking-tighter mb-2 hover:scale-105 transition-transform">YaLoPido</Link>
+                        <Link href="/" className="relative inline-block w-40 h-16 mx-auto hover:scale-105 transition-transform">
+                            <Image 
+                                src="/logo1.png" 
+                                alt="Menuvi Logo" 
+                                fill 
+                                className="object-contain"
+                                priority
+                            />
+                        </Link>
                         <p className="text-white/40 font-bold uppercase tracking-widest text-[10px]">Bienvenido de nuevo</p>
                     </div>
 

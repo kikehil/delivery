@@ -12,9 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('negocios', function (Blueprint $table) {
-            $table->string('direccion')->nullable();
-            $table->json('horarios')->nullable();
-            $table->json('opciones_servicio')->nullable();
+            if (!Schema::hasColumn('negocios', 'direccion')) {
+                $table->string('direccion')->nullable();
+            }
+            if (!Schema::hasColumn('negocios', 'horarios')) {
+                $table->json('horarios')->nullable();
+            }
+            if (!Schema::hasColumn('negocios', 'opciones_servicio')) {
+                $table->json('opciones_servicio')->nullable();
+            }
         });
     }
 
