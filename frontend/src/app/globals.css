@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+:root {
+  --yalopido-blue: #0b1c2e;
+  --yalopido-cyan: #00aeef;
+  --yalopido-green: #39b54a;
+  --yalopido-yellow: #ffd100;
+}
+
+body {
+  color: #0b1c2e;
+  background: #f8fafc;
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
