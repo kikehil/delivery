@@ -80,6 +80,9 @@ class AuthController extends Controller
             'entrega_domicilio' => 'boolean',
             'recolecta_pedidos' => 'boolean',
             'consumo_sucursal' => 'boolean',
+            'acepta_efectivo' => 'boolean',
+            'acepta_tarjeta' => 'boolean',
+            'acepta_transferencia' => 'boolean',
         ]);
 
         if ($validator->fails()) {
@@ -105,6 +108,9 @@ class AuthController extends Controller
                 'entrega_domicilio' => $request->has('entrega_domicilio') ? $request->entrega_domicilio : true,
                 'recolecta_pedidos' => $request->has('recolecta_pedidos') ? $request->recolecta_pedidos : true,
                 'consumo_sucursal' => $request->has('consumo_sucursal') ? $request->consumo_sucursal : true,
+                'acepta_efectivo' => $request->has('acepta_efectivo') ? $request->acepta_efectivo : true,
+                'acepta_tarjeta' => $request->has('acepta_tarjeta') ? $request->acepta_tarjeta : false,
+                'acepta_transferencia' => $request->has('acepta_transferencia') ? $request->acepta_transferencia : false,
                 'estado' => 'pendiente',
                 'plan' => 'esencial',
             ]);

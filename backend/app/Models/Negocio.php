@@ -30,7 +30,10 @@ class Negocio extends Model
         'opciones_servicio',
         'facebook_url',
         'instagram_url',
-        'youtube_url'
+        'youtube_url',
+        'acepta_efectivo',
+        'acepta_tarjeta',
+        'acepta_transferencia'
     ];
 
     protected $casts = [
@@ -40,6 +43,9 @@ class Negocio extends Model
         'entrega_domicilio' => 'boolean',
         'recolecta_pedidos' => 'boolean',
         'consumo_sucursal' => 'boolean',
+        'acepta_efectivo' => 'boolean',
+        'acepta_tarjeta' => 'boolean',
+        'acepta_transferencia' => 'boolean',
     ];
 
     public function user(): BelongsTo

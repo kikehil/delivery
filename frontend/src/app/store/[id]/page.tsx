@@ -23,7 +23,8 @@ import {
     Facebook,
     Youtube,
     Trash2,
-    Minus
+    Minus,
+    CheckCircle
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -44,6 +45,9 @@ interface Store {
     facebook_url?: string;
     instagram_url?: string;
     youtube_url?: string;
+    acepta_efectivo?: boolean;
+    acepta_tarjeta?: boolean;
+    acepta_transferencia?: boolean;
 }
 
 interface Product {
@@ -276,6 +280,28 @@ export default function StoreMenuPage() {
                                 <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 rounded-xl border border-white/5">
                                     <Utensils size={14} className="text-orange-400" />
                                     <span className="text-[9px] font-black uppercase tracking-widest">Local</span>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex items-center gap-2 mt-4 flex-wrap justify-center">
+                            <span className="text-[9px] font-black uppercase tracking-widest text-white/20 w-full mb-1">Pagos aceptados:</span>
+                            {store.acepta_efectivo && (
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-500/5 rounded-xl border border-cyan-500/10">
+                                    <CheckCircle size={12} className="text-cyan-400" />
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-cyan-400/80">Efectivo</span>
+                                </div>
+                            )}
+                            {store.acepta_tarjeta && (
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-500/5 rounded-xl border border-cyan-500/10">
+                                    <CheckCircle size={12} className="text-cyan-400" />
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-cyan-400/80">Tarjeta</span>
+                                </div>
+                            )}
+                            {store.acepta_transferencia && (
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-500/5 rounded-xl border border-cyan-500/10">
+                                    <CheckCircle size={12} className="text-cyan-400" />
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-cyan-400/80">Transf.</span>
                                 </div>
                             )}
                         </div>

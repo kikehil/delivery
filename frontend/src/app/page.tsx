@@ -44,6 +44,10 @@ export default function Home() {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPromo, setCurrentPromo] = useState(0);
+  
+  // Search and Filter State
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -62,6 +66,16 @@ export default function Home() {
     }
     fetchData();
   }, []);
+
+  const filteredStores = stores.filter(store => {
+    const matchesSearch = store.nombre.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          store.categoria.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Exact match for category filter, but handle the "Antojitos" vs "Antojitos" case
+    const matchesCategory = !selectedCategory || store.categoria.toLowerCase().includes(selectedCategory.toLowerCase());
+    
+    return matchesSearch && matchesCategory;
+  });
 
   // Autoplay for carousel
   useEffect(() => {
@@ -105,6 +119,8 @@ export default function Home() {
             <input
               type="text"
               placeholder="¿Qué se te antoja hoy?"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-14 pr-6 py-4 bg-white/5 border border-white/5 rounded-2xl text-white placeholder:text-white/20 focus:ring-1 focus:ring-white/20 focus:bg-white/10 transition-all outline-none font-bold text-sm"
             />
           </div>
@@ -114,18 +130,32 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
         {/* Categories Horizontal Scroll */}
         <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 mask-fade-right">
+          <button 
+            onClick={() => setSelectedCategory(null)}
+            className="flex flex-col items-center gap-3 group min-w-[80px]"
+          >
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-2xl transition-all border ${!selectedCategory ? 'bg-cyan-500/20 border-cyan-500/50 scale-110' : 'bg-[#1a1a1a] border-white/5 group-hover:border-white/20 group-hover:scale-110'}`}>
+              🏠
+            </div>
+            <span className={`text-[10px] font-black uppercase tracking-widest transition-colors text-center whitespace-nowrap ${!selectedCategory ? 'text-cyan-400' : 'text-white/30 group-hover:text-white'}`}>Todos</span>
+          </button>
+
           {categories.map((cat) => (
-            <button key={cat.name} className="flex flex-col items-center gap-3 group min-w-[80px]">
-              <div className="w-16 h-16 bg-[#1a1a1a] border border-white/5 rounded-2xl flex items-center justify-center text-3xl shadow-2xl group-hover:scale-110 group-active:scale-95 transition-all group-hover:border-white/20">
+            <button 
+              key={cat.name} 
+              onClick={() => setSelectedCategory(selectedCategory === cat.name ? null : cat.name)}
+              className="flex flex-col items-center gap-3 group min-w-[80px]"
+            >
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-2xl transition-all border ${selectedCategory === cat.name ? 'bg-cyan-500/20 border-cyan-500/50 scale-110' : 'bg-[#1a1a1a] border-white/5 group-hover:border-white/20 group-hover:scale-110'}`}>
                 {cat.icon}
               </div>
-              <span className="text-[10px] font-black uppercase tracking-widest text-white/30 group-hover:text-white transition-colors text-center whitespace-nowrap">{cat.name}</span>
+              <span className={`text-[10px] font-black uppercase tracking-widest transition-colors text-center whitespace-nowrap ${selectedCategory === cat.name ? 'text-cyan-400' : 'text-white/30 group-hover:text-white'}`}>{cat.name}</span>
             </button>
           ))}
         </div>
 
         {/* Promotion Carousel */}
-        <div className="relative overflow-hidden rounded-[2.5rem]">
+        <div className="relative overflow-hidden rounded-[2.5rem] min-h-[250px] md:min-h-[320px]">
             <div className="relative h-64 md:h-80 w-full overflow-hidden">
                 <AnimatePresence mode="wait">
                     {promotions.length > 0 ? (
@@ -139,13 +169,13 @@ export default function Home() {
                         >
                             <Link 
                                 href={promotions[currentPromo].link_url || '#'}
-                                className="relative w-full h-full flex items-center px-8 md:px-16 group"
+                                className="relative w-full h-full flex items-center px-6 md:px-16 group"
                             >
                                 {/* Background Image */}
                                 <div className="absolute inset-0 z-0">
                                     <div 
                                         className="absolute inset-0 bg-gradient-to-r z-10" 
-                                        style={{ backgroundImage: `linear-gradient(to right, ${promotions[currentPromo].color_fondo}ff, ${promotions[currentPromo].color_fondo}88, transparent)` }}
+                                        style={{ backgroundImage: `linear-gradient(to right, ${promotions[currentPromo].color_fondo}ff, ${promotions[currentPromo].color_fondo}bb, transparent)` }}
                                     />
                                     <Image 
                                         src={promotions[currentPromo].imagen_url} 
@@ -157,19 +187,19 @@ export default function Home() {
                                 </div>
 
                                 {/* Content */}
-                                <div className="relative z-20 max-w-lg space-y-4">
+                                <div className="relative z-20 max-w-lg space-y-3 md:space-y-4">
                                     {promotions[currentPromo].tag_text && (
-                                        <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-white">
+                                        <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-white">
                                             {promotions[currentPromo].tag_text}
                                         </span>
                                     )}
-                                    <h2 className="text-4xl md:text-5xl font-black tracking-tighter leading-none text-white drop-shadow-2xl">
+                                    <h2 className="text-3xl md:text-5xl font-black tracking-tighter leading-tight text-white drop-shadow-2xl">
                                         {promotions[currentPromo].titulo}
                                     </h2>
-                                    <p className="text-white/80 font-bold text-sm md:text-base max-w-sm">
+                                    <p className="text-white/80 font-bold text-xs md:text-base max-w-xs md:max-w-sm line-clamp-2 md:line-clamp-none">
                                         {promotions[currentPromo].subtitulo}
                                     </p>
-                                    <button className="bg-white text-black px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-cyan-400 hover:text-white transition-all transform group-hover:translate-x-1 shadow-2xl">
+                                    <button className="bg-white text-black px-5 py-2.5 md:px-6 md:py-3 rounded-xl font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-cyan-400 hover:text-white transition-all transform group-hover:translate-x-1 shadow-2xl">
                                         {promotions[currentPromo].boton_text}
                                     </button>
                                 </div>
@@ -177,7 +207,7 @@ export default function Home() {
                         </motion.div>
                     ) : (
                         <div className="w-full h-full bg-[#1a1a1a] flex items-center justify-center animate-pulse">
-                            <span className="text-white/10 font-black uppercase tracking-widest">Cargando ofertas...</span>
+                            <span className="text-white/10 font-black uppercase tracking-widest text-[10px]">Cargando ofertas...</span>
                         </div>
                     )}
                 </AnimatePresence>
@@ -209,14 +239,14 @@ export default function Home() {
           </div>
           
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                {[1,2,3].map(i => (
-                 <div key={i} className="h-72 bg-white/5 rounded-[2.5rem] animate-pulse border border-white/5" />
+                 <div key={i} className="h-64 md:h-72 bg-white/5 rounded-[2.5rem] animate-pulse border border-white/5" />
                ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {stores.map((store) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+              {filteredStores.map((store) => (
                 <Link href={`/store/${store.id}`} key={store.id} className="group cursor-pointer">
                   <div className="relative aspect-video rounded-[2.5rem] overflow-hidden shadow-2xl bg-[#1a1a1a] border border-white/5 group-hover:border-white/10 transition-all mb-4">
                     <div className="absolute top-4 right-4 z-10 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-white/10 flex items-center gap-1.5 shadow-xl">
@@ -258,10 +288,10 @@ export default function Home() {
                 </Link>
               ))}
 
-              {stores.length === 0 && (
+              {filteredStores.length === 0 && (
                 <div className="col-span-full py-20 text-center space-y-4">
                    <div className="text-6xl opacity-20 mb-4">🛵</div>
-                   <p className="text-white/30 font-black uppercase tracking-widest text-sm">No hay tiendas abiertas por ahora</p>
+                   <p className="text-white/30 font-black uppercase tracking-widest text-sm">No encontramos negocios con esos criterios</p>
                 </div>
               )}
             </div>

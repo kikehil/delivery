@@ -56,6 +56,11 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::get('/users', function() {
             return response()->json(['data' => \App\Models\User::all()]);
         });
+
+        // Liquidaciones
+        Route::get('/payments', [\App\Http\Controllers\Api\LiquidacionController::class, 'index']);
+        Route::post('/payments', [\App\Http\Controllers\Api\LiquidacionController::class, 'store']);
+        Route::put('/payments/{id}/status', [\App\Http\Controllers\Api\LiquidacionController::class, 'updateStatus']);
     });
 
     // Socio (Partner) Only
@@ -76,6 +81,9 @@ Route::group(['middleware' => 'auth:api'], function () {
         // Settings
         Route::get('/settings', [\App\Http\Controllers\Api\PartnerController::class, 'getSettings']);
         Route::put('/settings', [\App\Http\Controllers\Api\PartnerController::class, 'updateSettings']);
+
+        // Liquidaciones del socio
+        Route::get('/payments', [\App\Http\Controllers\Api\LiquidacionController::class, 'partnerLiquidaciones']);
     });
 
     // Cliente Only
