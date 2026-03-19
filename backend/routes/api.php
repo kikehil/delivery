@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\StoreController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\ProductoController;
+use App\Http\Controllers\Api\CouponController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,9 +20,9 @@ Route::group([
     'middleware' => 'api',
     'prefix' => 'auth'
 ], function ($router) {
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/register-partner', [AuthController::class, 'registerPartner']);
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:10,1');
+    Route::post('/register-partner', [AuthController::class, 'registerPartner'])->middleware('throttle:5,1');
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
     Route::post('/refresh', [AuthController::class, 'refresh'])->middleware('auth:api');
     Route::get('/me', [AuthController::class, 'me'])->middleware('auth:api');
@@ -31,12 +33,15 @@ Route::get('/zones', [StoreController::class, 'getZones']);
 Route::get('/stores', [StoreController::class, 'index']);
 Route::get('/stores/{id}', [StoreController::class, 'show']);
 Route::get('/stores/{id}/products', [ProductController::class, 'getByStore']);
+Route::get('/productos', [ProductoController::class, 'index']);
 
 // Public promotions
 Route::get('/promotions', [App\Http\Controllers\Api\PromocionController::class, 'index']);
+Route::post('/coupons/validate', [CouponController::class, 'validateCoupon']);
 
 // Orders
 Route::post('/orders', [OrderController::class, 'store']);
+Route::get('/orders/{id}/status', [OrderController::class, 'status']);
 
 // User Routes (Logged in)
 Route::group(['middleware' => 'auth:api'], function () {

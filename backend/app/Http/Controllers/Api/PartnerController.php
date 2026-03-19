@@ -205,16 +205,21 @@ class PartnerController extends Controller
         $status = $request->query('status');
         
         $query = Pedido::where('comercio_id', $business->id)->orderBy('created_at', 'desc');
-        
+
         if ($status) {
             $query->where('estado', $status);
         }
-        
-        $orders = $query->get();
-        
+
+        $orders = $query->paginate($request->query('per_page', 50));
+
         return response()->json([
             'status' => 'success',
-            'data' => $orders
+            'data' => $orders->items(),
+            'meta' => [
+                'current_page' => $orders->currentPage(),
+                'last_page' => $orders->lastPage(),
+                'total' => $orders->total(),
+            ]
         ]);
     }
 

@@ -377,80 +377,109 @@ export default function StoreMenuPage() {
                     />
                 </div>
 
-                {Object.entries(filteredGroups).map(([category, items], idx) => (
-                    <div key={category} className="space-y-6">
-                        <div className="flex items-center gap-4">
-                            <h2 className="text-xl font-black tracking-tight">{category}</h2>
-                            <div className="h-[2px] flex-1 bg-gradient-to-r from-white/10 to-transparent" />
-                        </div>
+                {Object.keys(filteredGroups).length > 0 ? (
+                    Object.entries(filteredGroups).map(([category, items], idx) => (
+                        <div key={category} className="space-y-6">
+                            <div className="flex items-center gap-4">
+                                <h2 className="text-xl font-black tracking-tight">{category}</h2>
+                                <div className="h-[2px] flex-1 bg-gradient-to-r from-white/10 to-transparent" />
+                            </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {items.map((product) => (
-                                <motion.div 
-                                    whileHover={{ scale: 1.01 }}
-                                    key={product.id}
-                                    className="bg-[#1a1a1a] p-5 rounded-[2rem] flex gap-5 border border-white/5 hover:border-white/10 transition-all group"
-                                >
-                                    <div className="relative w-24 h-24 rounded-2xl overflow-hidden bg-[#0a0a0a] flex-shrink-0">
-                                        {product.foto_url ? (
-                                            <Image 
-                                                src={product.foto_url} 
-                                                alt={product.nombre} 
-                                                fill 
-                                                className="object-cover group-hover:scale-110 transition-transform duration-500" 
-                                                unoptimized
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-2xl opacity-20">🍔</div>
-                                        )}
-                                    </div>
-                                    
-                                    <div className="flex-1 flex flex-col justify-between py-1">
-                                        <div>
-                                            <h3 className="font-black text-md leading-tight mb-1">{product.nombre}</h3>
-                                            <p className="text-white/40 text-[10px] font-medium line-clamp-2 leading-relaxed h-8">
-                                                {product.descripcion || 'Sin descripción disponible.'}
-                                            </p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {items.map((product) => (
+                                    <motion.div 
+                                        whileHover={{ scale: 1.01 }}
+                                        key={product.id}
+                                        className="bg-[#1a1a1a] p-5 rounded-[2rem] flex gap-5 border border-white/5 hover:border-white/10 transition-all group"
+                                    >
+                                        <div className="relative w-24 h-24 rounded-2xl overflow-hidden bg-[#0a0a0a] flex-shrink-0">
+                                            {product.foto_url ? (
+                                                <Image 
+                                                    src={product.foto_url} 
+                                                    alt={product.nombre} 
+                                                    fill 
+                                                    className="object-cover group-hover:scale-110 transition-transform duration-500" 
+                                                    unoptimized
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-2xl opacity-20">🍔</div>
+                                            )}
                                         </div>
                                         
-                                        <div className="flex items-center justify-between mt-2">
-                                            <span className="font-mono font-black text-lg tracking-tighter">${parseFloat(product.precio.toString()).toFixed(0)}</span>
-                                            <div className="flex items-center gap-3">
-                                                {cartItems.find(i => i.id === product.id) && (
-                                                    <div className="flex items-center gap-3 bg-white/5 px-2 py-1 rounded-full border border-white/5">
-                                                        <button 
-                                                            onClick={(e) => { e.stopPropagation(); removeFromCart(product.id); }}
-                                                            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10 transition-all"
-                                                        >
-                                                            <Minus size={14} />
-                                                        </button>
-                                                        <span className="text-xs font-black w-4 text-center">
-                                                            {cartItems.find(i => i.id === product.id)?.qty}
-                                                        </span>
+                                        <div className="flex-1 flex flex-col justify-between py-1">
+                                            <div>
+                                                <h3 className="font-black text-md leading-tight mb-1">{product.nombre}</h3>
+                                                <p className="text-white/40 text-[10px] font-medium line-clamp-2 leading-relaxed h-8">
+                                                    {product.descripcion || 'Sin descripción disponible.'}
+                                                </p>
+                                            </div>
+                                            
+                                            <div className="flex items-center justify-between mt-2">
+                                                <span className="font-mono font-black text-lg tracking-tighter">${parseFloat(product.precio.toString()).toFixed(0)}</span>
+                                                <div className="flex items-center gap-3">
+                                                    {cartItems.find(i => i.id === product.id) && (
+                                                        <div className="flex items-center gap-3 bg-white/5 px-2 py-1 rounded-full border border-white/5">
+                                                            <button 
+                                                                onClick={(e) => { e.stopPropagation(); removeFromCart(product.id); }}
+                                                                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10 transition-all"
+                                                            >
+                                                                <Minus size={14} />
+                                                            </button>
+                                                            <span className="text-xs font-black w-4 text-center">
+                                                                {cartItems.find(i => i.id === product.id)?.qty}
+                                                            </span>
+                                                            <button 
+                                                                onClick={(e) => { e.stopPropagation(); addToCart(product); }}
+                                                                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10 transition-all font-black"
+                                                            >
+                                                                <Plus size={14} />
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                    {!cartItems.find(i => i.id === product.id) && (
                                                         <button 
                                                             onClick={(e) => { e.stopPropagation(); addToCart(product); }}
-                                                            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10 transition-all font-black"
+                                                            className="w-10 h-10 bg-white text-black rounded-full flex items-center justify-center hover:scale-110 active:scale-90 transition-all shadow-xl shadow-white/5"
                                                         >
-                                                            <Plus size={14} />
+                                                            <Plus size={20} />
                                                         </button>
-                                                    </div>
-                                                )}
-                                                {!cartItems.find(i => i.id === product.id) && (
-                                                    <button 
-                                                        onClick={(e) => { e.stopPropagation(); addToCart(product); }}
-                                                        className="w-10 h-10 bg-white text-black rounded-full flex items-center justify-center hover:scale-110 active:scale-90 transition-all shadow-xl shadow-white/5"
-                                                    >
-                                                        <Plus size={20} />
-                                                    </button>
-                                                )}
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </motion.div>
-                            ))}
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="py-20 text-center space-y-8 flex flex-col items-center">
+                        <div className="relative w-56 h-56 md:w-72 md:h-72 opacity-90 group-hover:opacity-100 transition-opacity">
+                            <Image 
+                                src="/empty_menu.png" 
+                                alt="Menú vacío" 
+                                fill 
+                                className="object-contain"
+                            />
+                        </div>
+                        <div className="max-w-md mx-auto space-y-4">
+                            <div className="space-y-2">
+                                <p className="text-white font-black uppercase tracking-widest text-lg leading-tight px-4">
+                                    ¡Vaya! Parece que {store.nombre} aún no sube su menú
+                                </p>
+                                <p className="text-cyan-400 font-bold text-[10px] uppercase tracking-[0.3em] px-4">
+                                    Recuérdales que para ti es más fácil pedir por Menuvi
+                                </p>
+                            </div>
+                            <button 
+                                onClick={() => window.open(`https://wa.me/${store.whatsapp_pedidos}?text=Hola%20${store.nombre},%20vi%20tu%20perfil%20en%20Menuvi%20pero%20aún%20no%20tienes%20tu%20menú%20actualizado.%20¡Súbelo%20para%20poder%20pedirte%20fácil!`, '_blank')}
+                                className="px-8 py-3 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-white/60 hover:text-white"
+                            >
+                                Enviar recordatorio por WhatsApp
+                            </button>
                         </div>
                     </div>
-                ))}
+                )}
             </div>
 
             {/* Floating Cart Button */}

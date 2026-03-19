@@ -1,6 +1,7 @@
 # Common ignore files
 node_modules/
 vendor/
+database_backups/
 .env
 .env.local
 .env.*.local

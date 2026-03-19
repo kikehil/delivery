@@ -120,7 +120,7 @@ export default function PartnerOrders() {
                                 {/* Order Content */}
                                 <div className="flex-1 space-y-1">
                                     <p className="text-slate-900 font-black text-lg line-clamp-1">
-                                        {order.items_json.map((item: any) => `${item.quantity}x ${item.name}`).join(', ')}
+                                        {order.items_json.map((item: any) => `${item.qty}x ${item.nombre}`).join(', ')}
                                     </p>
                                     <div className="flex flex-wrap items-center gap-4 text-slate-500 text-xs font-bold leading-none">
                                         <div className="flex items-center gap-1.5"><MapPin size={14} className="text-slate-400" /> {order.cliente_zona}</div>

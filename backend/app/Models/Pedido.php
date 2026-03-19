@@ -20,6 +20,8 @@ class Pedido extends Model
         'estado',
         'metodo_pago',
         'modalidad',
+        'repartidor_nombre',
+        'repartidor_telefono',
     ];
 
     protected $casts = [

@@ -49,11 +49,20 @@ class AdminController extends Controller
     /**
      * List all businesses
      */
-    public function getBusinesses()
+    public function getBusinesses(Request $request)
     {
+        $businesses = Negocio::with('user')
+            ->orderBy('created_at', 'desc')
+            ->paginate($request->query('per_page', 20));
+
         return response()->json([
             'status' => 'success',
-            'data' => Negocio::with('user')->get()
+            'data' => $businesses->items(),
+            'meta' => [
+                'current_page' => $businesses->currentPage(),
+                'last_page' => $businesses->lastPage(),
+                'total' => $businesses->total(),
+            ]
         ]);
     }
 
@@ -62,10 +71,14 @@ class AdminController extends Controller
      */
     public function updateBusinessStatus(Request $request, $id)
     {
+        $request->validate([
+            'estado' => 'required|in:pendiente,activo,suspendido,rechazado'
+        ]);
+
         $business = Negocio::findOrFail($id);
         $business->estado = $request->estado;
         $business->save();
-        
+
         return response()->json([
             'status' => 'success',
             'message' => 'Estado del negocio actualizado'

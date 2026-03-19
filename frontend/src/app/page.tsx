@@ -289,9 +289,23 @@ export default function Home() {
               ))}
 
               {filteredStores.length === 0 && (
-                <div className="col-span-full py-20 text-center space-y-4">
-                   <div className="text-6xl opacity-20 mb-4">🛵</div>
-                   <p className="text-white/30 font-black uppercase tracking-widest text-sm">No encontramos negocios con esos criterios</p>
+                <div className="col-span-full py-20 text-center space-y-6 flex flex-col items-center">
+                   <div className="relative w-48 h-48 md:w-64 md:h-64 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <Image 
+                        src="/empty_category.png" 
+                        alt="Sin negocios" 
+                        fill 
+                        className="object-contain"
+                      />
+                   </div>
+                   <div className="max-w-xs mx-auto space-y-2">
+                     <p className="text-white/80 font-black uppercase tracking-widest text-sm leading-relaxed">
+                        Tu {selectedCategory ? selectedCategory.toLowerCase() : 'negocio'} favorito aún no se nos une
+                     </p>
+                     <p className="text-cyan-400/60 font-bold text-[10px] uppercase tracking-[0.2em]">
+                        ¡Invítalos a que lo hagan y pidan por Menuvi!
+                     </p>
+                   </div>
                 </div>
               )}
             </div>
