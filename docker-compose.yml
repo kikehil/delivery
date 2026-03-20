@@ -25,7 +25,7 @@ services:
     container_name: menuvi_frontend
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3011:3000"
     networks:
       - menuvi_net
 
