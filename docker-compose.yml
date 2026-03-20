@@ -1,80 +1,72 @@
 services:
-  # Backend: Laravel API
   backend:
     build:
-      context: ./docker/php
-      dockerfile: Dockerfile
-    container_name: yalopido_backend
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: menuvi_backend
+    restart: unless-stopped
     volumes:
       - ./backend:/var/www/html
-    environment:
-      - DB_CONNECTION=mysql
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_DATABASE=yalopido_db
-      - DB_USERNAME=root
-      - DB_PASSWORD=root_password
+      - backend_storage:/var/www/html/storage/app/public
+    env_file:
+      - ./backend/.env
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
     networks:
-      - yalopido_net
+      - menuvi_net
 
-  # Frontend: Next.js
   frontend:
     build:
-      context: ./docker/nextjs
-      dockerfile: Dockerfile
-    container_name: yalopido_frontend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      context: ./frontend
+      dockerfile: ../docker/nextjs/Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://delivery.noddal.cloud/api}
+    container_name: menuvi_frontend
+    restart: unless-stopped
     ports:
       - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
     networks:
-      - yalopido_net
+      - menuvi_net
 
-  # Database: MySQL
   db:
     image: mysql:8.0
-    container_name: yalopido_db
-    restart: always
+    container_name: menuvi_db
+    restart: unless-stopped
     environment:
-      MYSQL_DATABASE: yalopido_db
-      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: night_market_db
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root_password}
+      MYSQL_ROOT_HOST: '%'
     ports:
       - "3307:3306"
     volumes:
-      - yalopido_db_data:/var/lib/mysql
+      - menuvi_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
     networks:
-      - yalopido_net
+      - menuvi_net
 
-  # Cache/Queue: Redis
-  redis:
-    image: redis:alpine
-    container_name: yalopido_redis
-    networks:
-      - yalopido_net
-
-  # Proxy/Webserver for Backend
   nginx:
     image: nginx:alpine
-    container_name: yalopido_nginx
+    container_name: menuvi_nginx
+    restart: unless-stopped
     ports:
       - "8000:80"
     volumes:
       - ./backend:/var/www/html
+      - backend_storage:/var/www/html/storage/app/public
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - backend
     networks:
-      - yalopido_net
+      - menuvi_net
 
 networks:
-  yalopido_net:
+  menuvi_net:
     driver: bridge
 
 volumes:
-  yalopido_db_data:
+  menuvi_db_data:
+  backend_storage:

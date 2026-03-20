@@ -1,9 +1,8 @@
 FROM php:8.3-fpm-alpine
 
-# Set working directory
 WORKDIR /var/www/html
 
-# Install dependencies
+# System dependencies
 RUN apk add --no-cache \
     curl \
     libpng-dev \
@@ -14,24 +13,28 @@ RUN apk add --no-cache \
     git \
     oniguruma-dev \
     icu-dev \
-    mysql-client
+    mysql-client \
+    bash
 
-# Install PHP extensions
+# PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
 
-# Install Composer
+# Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Create system user to run Composer and Artisan Commands
-RUN addgroup -g 1000 www
-RUN adduser -u 1000 -G www -s /bin/sh -D www
+# Create user
+RUN addgroup -g 1000 www && adduser -u 1000 -G www -s /bin/sh -D www
 
-# Copy existing application directory permissions
-COPY --chown=www:www . /var/www/html
+# Copy entrypoint (build context is repo root)
+COPY docker/php/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# Change current user to www
+# Copy app and install dependencies
+COPY --chown=www:www backend/ /var/www/html
+RUN composer install --optimize-autoloader --no-dev --no-interaction
+
 USER www
 
-# Expose port 9000 and start php-fpm server
 EXPOSE 9000
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["php-fpm"]

@@ -36,6 +36,7 @@ interface Store {
     logo_url: string;
     banner_url: string;
     telefono_contacto: string;
+    whatsapp_pedidos?: string;
     estado: string;
     direccion: string;
     horarios?: Record<string, { open: string, close: string, active: boolean }>;
