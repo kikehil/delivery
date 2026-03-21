@@ -94,9 +94,7 @@ export default function AdminPromotions() {
                 data.append('imagen', file);
             }
 
-            await api.post('/admin/promotions', data, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
+            await api.post('/admin/promotions', data);
             await fetchData();
             setIsModalOpen(false);
             setFormData({

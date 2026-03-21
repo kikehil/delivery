@@ -48,9 +48,15 @@ class PromocionController extends Controller
             'color_fondo' => 'string'
         ]);
 
+        $imageUrl = null;
         if ($request->hasFile('imagen')) {
             $path = $request->file('imagen')->store('promociones', 'public');
-            $validated['imagen_url'] = asset('storage/' . $path);
+            $imageUrl = asset('storage/' . $path);
+        }
+
+        unset($validated['imagen']);
+        if ($imageUrl) {
+            $validated['imagen_url'] = $imageUrl;
         }
 
         $promotion = Promocion::create($validated);
@@ -81,6 +87,7 @@ class PromocionController extends Controller
             $validated['imagen_url'] = asset('storage/' . $path);
         }
 
+        unset($validated['imagen']);
         $promotion->update($validated);
         return response()->json(['data' => $promotion]);
     }
