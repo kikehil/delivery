@@ -41,11 +41,12 @@ export default function AdminPromotions() {
         subtitulo: '',
         tag_text: '',
         boton_text: 'Explorar',
-        imagen_url: '',
         link_url: '',
         color_fondo: '#4f46e5',
         orden: 0
     });
+    const [file, setFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     const fetchData = async () => {
         try {
@@ -85,7 +86,17 @@ export default function AdminPromotions() {
         e.preventDefault();
         setFormLoading(true);
         try {
-            await api.post('/admin/promotions', formData);
+            const data = new FormData();
+            Object.entries(formData).forEach(([key, value]) => {
+                data.append(key, value.toString());
+            });
+            if (file) {
+                data.append('imagen', file);
+            }
+
+            await api.post('/admin/promotions', data, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
             await fetchData();
             setIsModalOpen(false);
             setFormData({
@@ -93,11 +104,12 @@ export default function AdminPromotions() {
                 subtitulo: '',
                 tag_text: '',
                 boton_text: 'Explorar',
-                imagen_url: '',
                 link_url: '',
                 color_fondo: '#4f46e5',
                 orden: 0
             });
+            setFile(null);
+            setPreviewUrl(null);
         } catch (e) {
             console.error('Error creating promotion');
         } finally {
@@ -250,17 +262,36 @@ export default function AdminPromotions() {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-indigo-400 pl-1">URL de la Imagen</label>
-                                        <div className="relative">
-                                            <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                                            <input 
-                                                type="text" 
-                                                required
-                                                className="w-full pl-12 pr-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 outline-none font-bold text-sm"
-                                                placeholder="https://images.unsplash..."
-                                                value={formData.imagen_url}
-                                                onChange={e => setFormData({...formData, imagen_url: e.target.value})}
-                                            />
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-indigo-400 pl-1">Imagen del Banner (Recomendado: 1280x420 px)</label>
+                                        <div className="relative group">
+                                            <div className={`w-full h-32 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center transition-all cursor-pointer hover:border-indigo-400 group-hover:bg-indigo-50/30 ${previewUrl ? 'border-none p-0 overflow-hidden' : 'p-4'}`}>
+                                                {previewUrl ? (
+                                                    <div className="relative w-full h-full">
+                                                        <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                                            <p className="text-white text-[10px] font-black uppercase tracking-widest">Cambiar Imagen</p>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <ImageIcon className="text-slate-300 mb-2" size={24} />
+                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Haz clic para subir imagen</p>
+                                                    </>
+                                                )}
+                                                <input 
+                                                    type="file" 
+                                                    required={!previewUrl}
+                                                    accept="image/*"
+                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                    onChange={e => {
+                                                        const selectedFile = e.target.files?.[0];
+                                                        if (selectedFile) {
+                                                            setFile(selectedFile);
+                                                            setPreviewUrl(URL.createObjectURL(selectedFile));
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="space-y-2">

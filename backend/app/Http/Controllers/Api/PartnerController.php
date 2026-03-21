@@ -102,15 +102,21 @@ class PartnerController extends Controller
             'nombre' => 'required|string|max:150',
             'precio' => 'required|numeric|min:0',
             'descripcion' => 'nullable|string',
-            'foto_url' => 'nullable|url',
+            'foto' => 'nullable|image|max:5120',
         ]);
+        
+        $fotoUrl = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400';
+        if ($request->hasFile('foto')) {
+            $path = $request->file('foto')->store('productos', 'public');
+            $fotoUrl = asset('storage/' . $path);
+        }
         
         $product = Producto::create([
             'id_negocio' => $business->id,
             'nombre' => $request->nombre,
             'precio' => $request->precio,
             'descripcion' => $request->descripcion,
-            'foto_url' => $request->foto_url ?? 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400',
+            'foto_url' => $fotoUrl,
             'disponible' => true,
         ]);
         
@@ -133,10 +139,17 @@ class PartnerController extends Controller
             'nombre' => 'required|string|max:150',
             'precio' => 'required|numeric|min:0',
             'descripcion' => 'nullable|string',
-            'foto_url' => 'nullable|url',
+            'foto' => 'nullable|image|max:5120',
         ]);
         
-        $product->update($request->only(['nombre', 'precio', 'descripcion', 'foto_url']));
+        $updates = $request->only(['nombre', 'precio', 'descripcion']);
+
+        if ($request->hasFile('foto')) {
+            $path = $request->file('foto')->store('productos', 'public');
+            $updates['foto_url'] = asset('storage/' . $path);
+        }
+        
+        $product->update($updates);
         
         return response()->json([
             'status' => 'success',
@@ -182,12 +195,24 @@ class PartnerController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:150',
             'telefono_contacto' => 'required|string|max:20',
-            'logo_url' => 'nullable|url',
-            'banner_url' => 'nullable|url',
+            'logo' => 'nullable|image|max:2048',
+            'banner' => 'nullable|image|max:5120',
             'categoria' => 'required|string|max:100',
         ]);
         
-        $business->update($request->only(['nombre', 'telefono_contacto', 'logo_url', 'banner_url', 'categoria']));
+        $updates = $request->only(['nombre', 'telefono_contacto', 'categoria']);
+
+        if ($request->hasFile('logo')) {
+            $path = $request->file('logo')->store('logos', 'public');
+            $updates['logo_url'] = asset('storage/' . $path);
+        }
+
+        if ($request->hasFile('banner')) {
+            $path = $request->file('banner')->store('banners', 'public');
+            $updates['banner_url'] = asset('storage/' . $path);
+        }
+
+        $business->update($updates);
         
         return response()->json([
             'status' => 'success',

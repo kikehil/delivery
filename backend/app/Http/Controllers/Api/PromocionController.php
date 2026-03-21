@@ -42,11 +42,16 @@ class PromocionController extends Controller
             'subtitulo' => 'nullable|string',
             'tag_text' => 'nullable|string',
             'boton_text' => 'string',
-            'imagen_url' => 'required|string',
+            'imagen' => 'required|image|max:5120', // Up to 5MB
             'link_url' => 'nullable|string',
             'orden' => 'integer',
             'color_fondo' => 'string'
         ]);
+
+        if ($request->hasFile('imagen')) {
+            $path = $request->file('imagen')->store('promociones', 'public');
+            $validated['imagen_url'] = asset('storage/' . $path);
+        }
 
         $promotion = Promocion::create($validated);
         return response()->json(['data' => $promotion]);
@@ -64,12 +69,17 @@ class PromocionController extends Controller
             'subtitulo' => 'nullable|string',
             'tag_text' => 'nullable|string',
             'boton_text' => 'string',
-            'imagen_url' => 'string',
+            'imagen' => 'nullable|image|max:5120',
             'link_url' => 'nullable|string',
             'orden' => 'integer',
             'activo' => 'boolean',
             'color_fondo' => 'string'
         ]);
+
+        if ($request->hasFile('imagen')) {
+            $path = $request->file('imagen')->store('promociones', 'public');
+            $validated['imagen_url'] = asset('storage/' . $path);
+        }
 
         $promotion->update($validated);
         return response()->json(['data' => $promotion]);
